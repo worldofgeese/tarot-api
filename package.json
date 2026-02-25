@@ -1,0 +1,21 @@
+{
+  "name": "tarot-api",
+  "version": "1.0.0",
+  "description": "A three-tier tarot card API with SQLite, Elysia, and server-rendered HTML",
+  "type": "module",
+  "scripts": {
+    "dev": "bun run --watch src/index.ts",
+    "start": "bun run src/index.ts",
+    "test": "bun test $(find tests -maxdepth 1 -name '*.test.ts')",
+    "e2e": "source /home/node/.openclaw/devbox-env/lib/playwright-env.sh && bun test --preload ./tests/e2e/setup.ts tests/e2e/",
+    "seed": "bun run src/db/seed.ts",
+    "build-data": "bun run src/db/seed.ts"
+  },
+  "dependencies": {
+    "elysia": "^1.0.0",
+    "@elysiajs/static": "^1.0.0"
+  },
+  "devDependencies": {
+    "bun-types": "latest"
+  }
+}
