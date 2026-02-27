@@ -4,6 +4,17 @@ import { getSpreadByType, type Card } from "../lib/spread";
 
 export function apiRoutes(db: Database) {
   return new Elysia({ prefix: "/api" })
+    .get("/health", () => {
+      const countQuery = db.query("SELECT COUNT(*) as count FROM cards");
+      const result = countQuery.get() as { count: number };
+
+      return {
+        status: "ok",
+        timestamp: new Date().toISOString(),
+        cardCount: result.count
+      };
+    })
+
     .get("/cards", ({ query }) => {
       const { limit = "100", offset = "0", arcana, suit } = query;
 
