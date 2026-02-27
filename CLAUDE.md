@@ -1,44 +1,52 @@
-# CLAUDE.md - Agent Entrypoint
+# CLAUDE.md — Tarot API
 
-You are working in a Decapod-managed repository.
-See `AGENTS.md` for the universal contract.
+## Environment
+- **decapod** is at `/home/node/.openclaw/bin/decapod` or `/home/node/.local/bin/decapod`
+- **PATH** should include: `/home/node/.openclaw/bin:/home/node/.local/bin`
+- Run: `export PATH="/home/node/.openclaw/bin:/home/node/.local/bin:$PATH"` before using decapod
 
-## Quick Start
+## Mandatory Workflow
 
+### 0. Initialize Decapod
 ```bash
-cargo install decapod
-
-decapod validate
-decapod docs ingest
-decapod session acquire
-decapod rpc --op agent.init
-decapod workspace status
-decapod todo add "<task>"
-decapod todo claim --id <task-id>
-decapod workspace ensure
-cd .decapod/workspaces/<your-worktree>
-decapod rpc --op context.resolve
+export PATH="/home/node/.openclaw/bin:/home/node/.local/bin:$PATH"
+decapod version  # verify it works
+cd /tmp/tarot-api-spread
+decapod activate 2>/dev/null || true  # activate if not already
 ```
 
-## Control-Plane First
+### 1. Plan
+Before writing any code, describe your plan:
+- What files you'll modify
+- What tests you'll write
+- What edge cases you see
 
+### 2. TDD (Tests First)
+- Write failing tests FIRST
+- Run them to confirm they fail: `bun test tests/<name>.test.ts`
+- Commit the failing tests: `git add . && git commit -m "test: add failing tests for <feature>"`
+- THEN implement until tests pass
+- Commit the implementation: `git add . && git commit -m "feat: <description>"`
+
+### 3. Self-Review
+Before your final commit, re-read your diff (`git diff HEAD~1`) and report:
+1. Three things that could break
+2. Any edge cases you didn't test
+3. Whether you actually followed TDD
+
+### 4. Validate
 ```bash
-decapod capabilities --format json
-decapod rpc --op context.scope --params '{"query":"<problem>","limit":8}'
-decapod data schema --deterministic
+export PATH="/home/node/.openclaw/bin:/home/node/.local/bin:$PATH"
+bun test
+decapod validate 2>/dev/null || echo "decapod validate skipped"
 ```
 
-## Operating Mode
+### 5. Branch Discipline
+- You are on branch `feat/spread-system`. Stay on it.
+- Do NOT push — only commit locally.
+- The orchestrator will review, merge, and push.
 
-- Use Docker git workspaces and execute in `.decapod/workspaces/*`.
-- Call `decapod workspace status` at startup and before implementation work.
-- request elevated permissions before Docker/container workspace commands.
-- `.decapod files are accessed only via decapod CLI`.
-- `DECAPOD_SESSION_PASSWORD` is required for session-scoped operations.
-- Read canonical router: `decapod docs show core/DECAPOD.md`.
-- Use shared aptitude memory for human-taught preferences across sessions/providers: `decapod data memory add|get` (aliases: `decapod data aptitude`).
-- Operator reference: `decapod docs show docs/PLAYBOOK.md`.
-- Capability authority: `decapod capabilities --format json`.
-- Scoped context feature: `decapod docs search --query "<problem>" --op <op>` or `decapod rpc --op context.scope`.
-
-Stop if requirements are ambiguous or conflicting.
+## Project Info
+- **Stack:** Bun + Elysia + SQLite
+- **Tests:** `bun test` (unit/API)
+- **DB:** `cards` table with 78 tarot cards
