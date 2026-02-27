@@ -193,5 +193,29 @@ export function apiRoutes(db: Database) {
         ...card,
         keywords: JSON.parse(card.keywords)
       }));
+    })
+
+    .get("/cards/arcana/:type", ({ params: { type }, set }) => {
+      const normalizedType = type.toLowerCase();
+
+      if (normalizedType !== "major" && normalizedType !== "minor") {
+        set.status = 400;
+        return { error: "Invalid arcana type. Use 'major' or 'minor'" };
+      }
+
+      let sql: string;
+      if (normalizedType === "major") {
+        sql = "SELECT * FROM cards WHERE suit IS NULL OR suit = ''";
+      } else {
+        sql = "SELECT * FROM cards WHERE suit IS NOT NULL AND suit != ''";
+      }
+
+      const queryObj = db.query(sql);
+      const cards = queryObj.all() as Card[];
+
+      return cards.map(card => ({
+        ...card,
+        keywords: JSON.parse(card.keywords)
+      }));
     });
 }
