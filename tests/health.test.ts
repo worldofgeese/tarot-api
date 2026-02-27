@@ -29,12 +29,6 @@ describe("Health Endpoint Tests", () => {
     expect(data.status).toBe("ok");
   });
 
-  test("GET /api/health returns cardCount of 78", async () => {
-    const response = await fetch(`${baseUrl}/api/health`);
-    const data = await response.json();
-    expect(data.cardCount).toBe(78);
-  });
-
   test("GET /api/health returns valid ISO 8601 timestamp", async () => {
     const response = await fetch(`${baseUrl}/api/health`);
     const data = await response.json();
@@ -48,5 +42,36 @@ describe("Health Endpoint Tests", () => {
 
     // Verify it's not an invalid date
     expect(isNaN(date.getTime())).toBe(false);
+  });
+
+  test("GET /api/health returns dbConnected boolean", async () => {
+    const response = await fetch(`${baseUrl}/api/health`);
+    const data = await response.json();
+    expect(typeof data.dbConnected).toBe("boolean");
+    expect(data.dbConnected).toBe(true);
+  });
+
+  test("GET /api/health returns uptime in seconds", async () => {
+    const response = await fetch(`${baseUrl}/api/health`);
+    const data = await response.json();
+
+    // Verify uptime exists and is a number
+    expect(typeof data.uptime).toBe("number");
+
+    // Verify uptime is positive
+    expect(data.uptime).toBeGreaterThan(0);
+
+    // Verify uptime is reasonable (not in milliseconds)
+    expect(data.uptime).toBeLessThan(1000000);
+  });
+
+  test("GET /api/health response time is under 100ms", async () => {
+    const startTime = performance.now();
+    const response = await fetch(`${baseUrl}/api/health`);
+    await response.json();
+    const endTime = performance.now();
+
+    const responseTime = endTime - startTime;
+    expect(responseTime).toBeLessThan(100);
   });
 });
