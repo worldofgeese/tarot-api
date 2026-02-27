@@ -1,5 +1,5 @@
 import { test, expect } from "bun:test";
-import { chromium } from "/home/node/.local/lib/node_modules/@playwright/cli/node_modules/playwright";
+import { chromium } from "playwright";
 
 test("spread page draws 3 cards on button click", async () => {
   const browser = await chromium.launch();

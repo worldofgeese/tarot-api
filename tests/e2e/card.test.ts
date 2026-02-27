@@ -1,5 +1,5 @@
 import { test, expect } from "bun:test";
-import { chromium } from "/home/node/.local/lib/node_modules/@playwright/cli/node_modules/playwright";
+import { chromium } from "playwright";
 
 test("card detail page renders all fields", async () => {
   const browser = await chromium.launch();

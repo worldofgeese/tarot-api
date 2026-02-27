@@ -1,6 +1,7 @@
 import { Elysia } from "elysia";
 import { Database } from "bun:sqlite";
 import { getSpreadByType, type Card } from "../lib/spread";
+import { getSpread, listSpreads } from "../spreads";
 
 export function apiRoutes(db: Database) {
   return new Elysia({ prefix: "/api" })
@@ -217,5 +218,49 @@ export function apiRoutes(db: Database) {
         ...card,
         keywords: JSON.parse(card.keywords)
       }));
+    })
+
+    .get("/spreads", () => {
+      return listSpreads();
+    })
+
+    .get("/spreads/:id", ({ params: { id }, set }) => {
+      const spread = getSpread(id);
+
+      if (!spread) {
+        set.status = 404;
+        return { error: "Spread not found" };
+      }
+
+      return spread;
+    })
+
+    .post("/spreads/:id/draw", ({ params: { id }, set }) => {
+      const spread = getSpread(id);
+
+      if (!spread) {
+        set.status = 404;
+        return { error: "Spread not found" };
+      }
+
+      // Query random cards based on the number of positions
+      const positionCount = spread.positions.length;
+      const query = db.query("SELECT * FROM cards ORDER BY RANDOM() LIMIT ?");
+      const cards = query.all(positionCount) as Card[];
+
+      // Map each position to a card with reversed status
+      const drawnCards = spread.positions.map((position, index) => ({
+        position,
+        card: {
+          ...cards[index],
+          keywords: JSON.parse(cards[index].keywords)
+        },
+        reversed: Math.random() < 0.5
+      }));
+
+      return {
+        spread,
+        cards: drawnCards
+      };
     });
 }
