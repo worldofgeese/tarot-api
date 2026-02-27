@@ -97,5 +97,75 @@ export function apiRoutes(db: Database) {
         ...card,
         keywords: JSON.parse(card.keywords)
       }));
+    })
+
+    .get("/stats", () => {
+      const totalCardsQuery = db.query("SELECT COUNT(*) as count FROM cards");
+      const totalCardsResult = totalCardsQuery.get() as { count: number };
+
+      const majorArcanaQuery = db.query("SELECT COUNT(*) as count FROM cards WHERE suit IS NULL OR suit = ''");
+      const majorArcanaResult = majorArcanaQuery.get() as { count: number };
+
+      const minorArcanaQuery = db.query("SELECT COUNT(*) as count FROM cards WHERE suit IS NOT NULL AND suit != ''");
+      const minorArcanaResult = minorArcanaQuery.get() as { count: number };
+
+      const suitsQuery = db.query("SELECT DISTINCT suit FROM cards WHERE suit IS NOT NULL AND suit != '' ORDER BY suit");
+      const suitsResult = suitsQuery.all() as { suit: string }[];
+      const suits = suitsResult.map(row => row.suit);
+
+      return {
+        totalCards: totalCardsResult.count,
+        majorArcana: majorArcanaResult.count,
+        minorArcana: minorArcanaResult.count,
+        suits
+      };
+    })
+
+    .get("/cards/random", ({ query, set }) => {
+      const { count = "1" } = query;
+      const countNum = parseInt(count as string);
+
+      if (isNaN(countNum) || countNum < 1 || countNum > 10) {
+        set.status = 400;
+        return { error: "Count must be between 1 and 10" };
+      }
+
+      const randomQuery = db.query(`
+        SELECT * FROM cards
+        ORDER BY RANDOM()
+        LIMIT ?
+      `);
+
+      const cards = randomQuery.all(countNum) as Card[];
+
+      const formattedCards = cards.map(card => ({
+        ...card,
+        keywords: JSON.parse(card.keywords)
+      }));
+
+      return countNum === 1 ? formattedCards[0] : formattedCards;
+    })
+
+    .get("/cards/search", ({ query, set }) => {
+      const { q } = query;
+
+      if (!q || (q as string).trim() === "") {
+        set.status = 400;
+        return { error: "Query parameter 'q' is required" };
+      }
+
+      const searchTerm = `%${q}%`;
+      const searchQuery = db.query(`
+        SELECT * FROM cards
+        WHERE name LIKE ? COLLATE NOCASE OR keywords LIKE ? COLLATE NOCASE
+        ORDER BY id
+      `);
+
+      const cards = searchQuery.all(searchTerm, searchTerm) as Card[];
+
+      return cards.map(card => ({
+        ...card,
+        keywords: JSON.parse(card.keywords)
+      }));
     });
 }
