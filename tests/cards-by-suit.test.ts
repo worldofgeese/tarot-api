@@ -48,9 +48,9 @@ describe("Cards by Suit Endpoint Tests", () => {
     const response = await fetch(`${baseUrl}/api/cards/suit/Wands`);
     const data = await response.json();
 
-    // All cards should have suit "Wands"
+    // All cards should have suit "wands" (stored lowercase in DB)
     for (const card of data) {
-      expect(card.suit).toBe("Wands");
+      expect(card.suit).toBe("wands");
     }
   });
 
