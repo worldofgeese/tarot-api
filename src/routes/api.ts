@@ -174,5 +174,24 @@ export function apiRoutes(db: Database) {
         ...card,
         keywords: JSON.parse(card.keywords)
       }));
+    })
+
+    .get("/cards/suit/:suit", ({ params: { suit }, set }) => {
+      const query = db.query(`
+        SELECT * FROM cards
+        WHERE suit = ? COLLATE NOCASE
+        ORDER BY number ASC
+      `);
+      const cards = query.all(suit) as Card[];
+
+      if (cards.length === 0) {
+        set.status = 404;
+        return { error: "No cards found for suit" };
+      }
+
+      return cards.map(card => ({
+        ...card,
+        keywords: JSON.parse(card.keywords)
+      }));
     });
 }
