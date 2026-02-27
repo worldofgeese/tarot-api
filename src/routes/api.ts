@@ -49,8 +49,15 @@ export function apiRoutes(db: Database) {
     })
 
     .get("/cards/:id", ({ params: { id }, set }) => {
+      const numericId = parseInt(id);
+
+      if (isNaN(numericId)) {
+        set.status = 400;
+        return { error: "Invalid id" };
+      }
+
       const query = db.query("SELECT * FROM cards WHERE id = ?");
-      const card = query.get(parseInt(id)) as Card | null;
+      const card = query.get(numericId) as Card | null;
 
       if (!card) {
         set.status = 404;
