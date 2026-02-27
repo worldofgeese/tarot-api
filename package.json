@@ -16,6 +16,7 @@
     "@elysiajs/static": "^1.0.0"
   },
   "devDependencies": {
-    "bun-types": "latest"
+    "bun-types": "latest",
+    "playwright": "^1.58.2"
   }
 }
