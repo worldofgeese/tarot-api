@@ -2,6 +2,7 @@ import { Elysia } from "elysia";
 import { Database } from "bun:sqlite";
 import { getSpreadByType, type Card } from "../lib/spread";
 import { getSpread, listSpreads } from "../spreads";
+import { getDailyCard } from "../lib/daily";
 
 export function apiRoutes(db: Database) {
   return new Elysia({ prefix: "/api" })
@@ -141,6 +142,17 @@ export function apiRoutes(db: Database) {
       }));
 
       return countNum === 1 ? formattedCards[0] : formattedCards;
+    })
+
+    .get("/daily", () => {
+      const { card, date, reversed } = getDailyCard(db);
+
+      return {
+        ...card,
+        keywords: JSON.parse(card.keywords),
+        date,
+        reversed
+      };
     })
 
     .get("/cards/search", ({ query, set }) => {
