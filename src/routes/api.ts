@@ -2,20 +2,35 @@ import { Elysia } from "elysia";
 import { Database } from "bun:sqlite";
 import { getSpreadByType, type Card } from "../lib/spread";
 import { getSpread, listSpreads } from "../spreads";
+import { getDailyCard } from "../lib/daily";
+import { searchReversed } from "../lib/reversed";
+
+// Read version from package.json at module level
+import packageJson from "../../package.json";
+const VERSION = packageJson.version;
+
+function parseKeywords(keywords: string | null): string[] {
+  return keywords ? JSON.parse(keywords) : [];
+}
 
 export function apiRoutes(db: Database) {
   return new Elysia({ prefix: "/api" })
     .get("/health", () => {
-      const countQuery = db.query("SELECT COUNT(*) as count FROM cards");
-      const result = countQuery.get() as { count: number };
+      let database = "connected";
+
+      try {
+        db.query("SELECT 1").get();
+      } catch (error) {
+        database = "error";
+      }
 
       return {
         status: "ok",
         timestamp: new Date().toISOString(),
-        cardCount: result.count
+        database,
+        version: VERSION
       };
     })
-
     .get("/cards", ({ query }) => {
       const { limit = "100", offset = "0", arcana, suit } = query;
 
@@ -45,7 +60,7 @@ export function apiRoutes(db: Database) {
 
       return cards.map(card => ({
         ...card,
-        keywords: JSON.parse(card.keywords)
+        keywords: parseKeywords(card.keywords)
       }));
     })
 
@@ -67,7 +82,7 @@ export function apiRoutes(db: Database) {
 
       return {
         ...card,
-        keywords: JSON.parse(card.keywords)
+        keywords: parseKeywords(card.keywords)
       };
     })
 
@@ -76,7 +91,7 @@ export function apiRoutes(db: Database) {
         const cards = getSpreadByType(db, type);
         return cards.map(card => ({
           ...card,
-          keywords: JSON.parse(card.keywords)
+          keywords: parseKeywords(card.keywords)
         }));
       } catch (error) {
         set.status = 400;
@@ -103,7 +118,7 @@ export function apiRoutes(db: Database) {
 
       return cards.map(card => ({
         ...card,
-        keywords: JSON.parse(card.keywords)
+        keywords: parseKeywords(card.keywords)
       }));
     })
 
@@ -148,10 +163,21 @@ export function apiRoutes(db: Database) {
 
       const formattedCards = cards.map(card => ({
         ...card,
-        keywords: JSON.parse(card.keywords)
+        keywords: parseKeywords(card.keywords)
       }));
 
       return countNum === 1 ? formattedCards[0] : formattedCards;
+    })
+
+    .get("/daily", () => {
+      const { card, date, reversed } = getDailyCard(db);
+
+      return {
+        ...card,
+        keywords: parseKeywords(card.keywords),
+        date,
+        reversed
+      };
     })
 
     .get("/cards/search", ({ query, set }) => {
@@ -173,7 +199,23 @@ export function apiRoutes(db: Database) {
 
       return cards.map(card => ({
         ...card,
-        keywords: JSON.parse(card.keywords)
+        keywords: parseKeywords(card.keywords)
+      }));
+    })
+
+    .get("/cards/reversed", ({ query, set }) => {
+      const { q } = query;
+
+      if (!q || (q as string).trim() === "") {
+        set.status = 400;
+        return { error: "query parameter q is required" };
+      }
+
+      const cards = searchReversed(db, q as string);
+
+      return cards.map(card => ({
+        ...card,
+        keywords: parseKeywords(card.keywords)
       }));
     })
 
@@ -192,7 +234,7 @@ export function apiRoutes(db: Database) {
 
       return cards.map(card => ({
         ...card,
-        keywords: JSON.parse(card.keywords)
+        keywords: parseKeywords(card.keywords)
       }));
     })
 
@@ -216,7 +258,7 @@ export function apiRoutes(db: Database) {
 
       return cards.map(card => ({
         ...card,
-        keywords: JSON.parse(card.keywords)
+        keywords: parseKeywords(card.keywords)
       }));
     })
 
@@ -253,7 +295,7 @@ export function apiRoutes(db: Database) {
         position,
         card: {
           ...cards[index],
-          keywords: JSON.parse(cards[index].keywords)
+          keywords: parseKeywords(cards[index].keywords)
         },
         reversed: Math.random() < 0.5
       }));
