@@ -36,7 +36,7 @@ export function apiRoutes(db: Database) {
 
       return cards.map(card => ({
         ...card,
-        keywords: JSON.parse(card.keywords)
+        keywords: card.keywords ? JSON.parse(card.keywords) : []
       }));
     })
 
@@ -58,7 +58,7 @@ export function apiRoutes(db: Database) {
 
       return {
         ...card,
-        keywords: JSON.parse(card.keywords)
+        keywords: card.keywords ? JSON.parse(card.keywords) : []
       };
     })
 
@@ -94,7 +94,7 @@ export function apiRoutes(db: Database) {
 
       return cards.map(card => ({
         ...card,
-        keywords: JSON.parse(card.keywords)
+        keywords: card.keywords ? JSON.parse(card.keywords) : []
       }));
     })
 
@@ -139,7 +139,7 @@ export function apiRoutes(db: Database) {
 
       const formattedCards = cards.map(card => ({
         ...card,
-        keywords: JSON.parse(card.keywords)
+        keywords: card.keywords ? JSON.parse(card.keywords) : []
       }));
 
       return countNum === 1 ? formattedCards[0] : formattedCards;
@@ -150,7 +150,7 @@ export function apiRoutes(db: Database) {
 
       return {
         ...card,
-        keywords: JSON.parse(card.keywords),
+        keywords: card.keywords ? JSON.parse(card.keywords) : [],
         date,
         reversed
       };
@@ -175,7 +175,7 @@ export function apiRoutes(db: Database) {
 
       return cards.map(card => ({
         ...card,
-        keywords: JSON.parse(card.keywords)
+        keywords: card.keywords ? JSON.parse(card.keywords) : []
       }));
     })
 
@@ -191,7 +191,7 @@ export function apiRoutes(db: Database) {
 
       return cards.map(card => ({
         ...card,
-        keywords: JSON.parse(card.keywords)
+        keywords: card.keywords ? JSON.parse(card.keywords) : []
       }));
     })
 
@@ -210,7 +210,7 @@ export function apiRoutes(db: Database) {
 
       return cards.map(card => ({
         ...card,
-        keywords: JSON.parse(card.keywords)
+        keywords: card.keywords ? JSON.parse(card.keywords) : []
       }));
     })
 
@@ -234,7 +234,7 @@ export function apiRoutes(db: Database) {
 
       return cards.map(card => ({
         ...card,
-        keywords: JSON.parse(card.keywords)
+        keywords: card.keywords ? JSON.parse(card.keywords) : []
       }));
     })
 
@@ -271,7 +271,7 @@ export function apiRoutes(db: Database) {
         position,
         card: {
           ...cards[index],
-          keywords: JSON.parse(cards[index].keywords)
+          keywords: cards[index].keywords ? JSON.parse(cards[index].keywords) : []
         },
         reversed: Math.random() < 0.5
       }));

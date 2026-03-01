@@ -55,6 +55,13 @@ describe("Reversed Meaning Lookup Endpoint Tests", () => {
     expect(data.error).toBe("query parameter q is required");
   });
 
+  test("GET /api/cards/reversed?q=%20%20%20 (whitespace-only) returns 400", async () => {
+    const response = await fetch(`${baseUrl}/api/cards/reversed?q=%20%20%20`);
+    expect(response.status).toBe(400);
+    const data = await response.json();
+    expect(data.error).toBe("query parameter q is required");
+  });
+
   test("GET /api/cards/reversed?q=xyznonexistent returns 200 with empty array", async () => {
     const response = await fetch(`${baseUrl}/api/cards/reversed?q=xyznonexistent`);
     expect(response.status).toBe(200);
@@ -84,5 +91,13 @@ describe("Reversed Meaning Lookup Endpoint Tests", () => {
     const data = await response.json();
     expect(Array.isArray(data)).toBe(true);
     expect(data.length).toBeGreaterThan(0);
+  });
+
+  test("Results have parsed keywords array", async () => {
+    const response = await fetch(`${baseUrl}/api/cards/reversed?q=loss`);
+    const data = await response.json();
+    if (data.length > 0) {
+      expect(Array.isArray(data[0].keywords)).toBe(true);
+    }
   });
 });
