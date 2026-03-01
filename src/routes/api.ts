@@ -5,8 +5,28 @@ import { getSpread, listSpreads } from "../spreads";
 import { getDailyCard } from "../lib/daily";
 import { searchReversed } from "../lib/reversed";
 
+// Read version from package.json at module level
+import packageJson from "../../package.json";
+const VERSION = packageJson.version;
+
 export function apiRoutes(db: Database) {
   return new Elysia({ prefix: "/api" })
+    .get("/health", () => {
+      let database = "connected";
+
+      try {
+        db.query("SELECT 1").get();
+      } catch (error) {
+        database = "error";
+      }
+
+      return {
+        status: "ok",
+        timestamp: new Date().toISOString(),
+        database,
+        version: VERSION
+      };
+    })
     .get("/cards", ({ query }) => {
       const { limit = "100", offset = "0", arcana, suit } = query;
 
