@@ -61,4 +61,20 @@ describe("GET /api/health", () => {
     const contentType = response.headers.get("content-type");
     expect(contentType).toContain("application/json");
   });
+
+  test("response has cardCount field", async () => {
+    const response = await app.handle(
+      new Request("http://localhost/api/health")
+    );
+    const data = await response.json();
+    expect(data.cardCount).toBeDefined();
+  });
+
+  test("cardCount is a number", async () => {
+    const response = await app.handle(
+      new Request("http://localhost/api/health")
+    );
+    const data = await response.json();
+    expect(typeof data.cardCount).toBe("number");
+  });
 });
