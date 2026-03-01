@@ -3,7 +3,6 @@ import { staticPlugin } from "@elysiajs/static";
 import { initDatabase } from "./db/schema";
 import { apiRoutes } from "./routes/api";
 import { pageRoutes } from "./routes/pages";
-import { healthRoutes } from "./routes/health";
 
 export default function createApp() {
   const db = initDatabase();
@@ -13,7 +12,6 @@ export default function createApp() {
       assets: "public",
       prefix: "/public"
     }))
-    .use(healthRoutes(db))
     .use(apiRoutes(db))
     .use(pageRoutes(db));
 

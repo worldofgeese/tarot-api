@@ -9,6 +9,10 @@ import { searchReversed } from "../lib/reversed";
 import packageJson from "../../package.json";
 const VERSION = packageJson.version;
 
+function parseKeywords(keywords: string | null): string[] {
+  return keywords ? JSON.parse(keywords) : [];
+}
+
 export function apiRoutes(db: Database) {
   return new Elysia({ prefix: "/api" })
     .get("/health", () => {
@@ -56,7 +60,7 @@ export function apiRoutes(db: Database) {
 
       return cards.map(card => ({
         ...card,
-        keywords: card.keywords ? JSON.parse(card.keywords) : []
+        keywords: parseKeywords(card.keywords)
       }));
     })
 
@@ -78,7 +82,7 @@ export function apiRoutes(db: Database) {
 
       return {
         ...card,
-        keywords: card.keywords ? JSON.parse(card.keywords) : []
+        keywords: parseKeywords(card.keywords)
       };
     })
 
@@ -87,7 +91,7 @@ export function apiRoutes(db: Database) {
         const cards = getSpreadByType(db, type);
         return cards.map(card => ({
           ...card,
-          keywords: JSON.parse(card.keywords)
+          keywords: parseKeywords(card.keywords)
         }));
       } catch (error) {
         set.status = 400;
@@ -114,7 +118,7 @@ export function apiRoutes(db: Database) {
 
       return cards.map(card => ({
         ...card,
-        keywords: card.keywords ? JSON.parse(card.keywords) : []
+        keywords: parseKeywords(card.keywords)
       }));
     })
 
@@ -159,7 +163,7 @@ export function apiRoutes(db: Database) {
 
       const formattedCards = cards.map(card => ({
         ...card,
-        keywords: card.keywords ? JSON.parse(card.keywords) : []
+        keywords: parseKeywords(card.keywords)
       }));
 
       return countNum === 1 ? formattedCards[0] : formattedCards;
@@ -170,7 +174,7 @@ export function apiRoutes(db: Database) {
 
       return {
         ...card,
-        keywords: card.keywords ? JSON.parse(card.keywords) : [],
+        keywords: parseKeywords(card.keywords),
         date,
         reversed
       };
@@ -195,7 +199,7 @@ export function apiRoutes(db: Database) {
 
       return cards.map(card => ({
         ...card,
-        keywords: card.keywords ? JSON.parse(card.keywords) : []
+        keywords: parseKeywords(card.keywords)
       }));
     })
 
@@ -211,7 +215,7 @@ export function apiRoutes(db: Database) {
 
       return cards.map(card => ({
         ...card,
-        keywords: card.keywords ? JSON.parse(card.keywords) : []
+        keywords: parseKeywords(card.keywords)
       }));
     })
 
@@ -230,7 +234,7 @@ export function apiRoutes(db: Database) {
 
       return cards.map(card => ({
         ...card,
-        keywords: card.keywords ? JSON.parse(card.keywords) : []
+        keywords: parseKeywords(card.keywords)
       }));
     })
 
@@ -254,7 +258,7 @@ export function apiRoutes(db: Database) {
 
       return cards.map(card => ({
         ...card,
-        keywords: card.keywords ? JSON.parse(card.keywords) : []
+        keywords: parseKeywords(card.keywords)
       }));
     })
 
@@ -291,7 +295,7 @@ export function apiRoutes(db: Database) {
         position,
         card: {
           ...cards[index],
-          keywords: cards[index].keywords ? JSON.parse(cards[index].keywords) : []
+          keywords: parseKeywords(cards[index].keywords)
         },
         reversed: Math.random() < 0.5
       }));
