@@ -1,0 +1,7 @@
+# Bun configuration file
+
+[test]
+# Preload scripts for E2E tests:
+# 1. preload.ts - Sets up LD_LIBRARY_PATH for Playwright/Chromium
+# 2. setup.ts - Starts/stops test server
+preload = ["./tests/e2e/preload.ts", "./tests/e2e/setup.ts"]

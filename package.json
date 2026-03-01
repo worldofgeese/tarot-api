@@ -7,6 +7,8 @@
     "dev": "bun run --watch src/index.ts",
     "start": "bun run src/index.ts",
     "test": "bun test $(find tests -maxdepth 1 -name '*.test.ts')",
+    "test:e2e": "bash scripts/test-e2e.sh",
+    "test:all": "bun test",
     "e2e": "source /home/node/.openclaw/devbox-env/lib/playwright-env.sh && bun test --preload ./tests/e2e/setup.ts tests/e2e/",
     "seed": "bun run src/db/seed.ts",
     "build-data": "bun run src/db/seed.ts"
