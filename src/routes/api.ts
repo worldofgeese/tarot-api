@@ -17,6 +17,7 @@ export function apiRoutes(db: Database) {
   return new Elysia({ prefix: "/api" })
     .get("/health", () => {
       let database = "connected";
+      let cardCount = 0;
 
       try {
         db.query("SELECT 1").get();
@@ -24,11 +25,20 @@ export function apiRoutes(db: Database) {
         database = "error";
       }
 
+      try {
+        const countResult = db.query("SELECT COUNT(*) as count FROM cards").get() as { count: number };
+        cardCount = countResult.count;
+      } catch (error) {
+        // If count query fails, keep cardCount at 0
+        cardCount = 0;
+      }
+
       return {
         status: "ok",
         timestamp: new Date().toISOString(),
         database,
-        version: VERSION
+        version: VERSION,
+        cardCount
       };
     })
     .get("/cards", ({ query }) => {
