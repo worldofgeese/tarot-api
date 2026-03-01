@@ -3,6 +3,7 @@ import { Database } from "bun:sqlite";
 import { getSpreadByType, type Card } from "../lib/spread";
 import { getSpread, listSpreads } from "../spreads";
 import { getDailyCard } from "../lib/daily";
+import { searchReversed } from "../lib/reversed";
 
 export function apiRoutes(db: Database) {
   return new Elysia({ prefix: "/api" })
@@ -171,6 +172,22 @@ export function apiRoutes(db: Database) {
       `);
 
       const cards = searchQuery.all(searchTerm, searchTerm) as Card[];
+
+      return cards.map(card => ({
+        ...card,
+        keywords: JSON.parse(card.keywords)
+      }));
+    })
+
+    .get("/cards/reversed", ({ query, set }) => {
+      const { q } = query;
+
+      if (!q || (q as string).trim() === "") {
+        set.status = 400;
+        return { error: "query parameter q is required" };
+      }
+
+      const cards = searchReversed(db, q as string);
 
       return cards.map(card => ({
         ...card,
