@@ -23,7 +23,7 @@ jobs:
       - name: Seed database
         run: bun run seed
 
-      - name: Run tests
+      - name: Run tests (excludes E2E)
         run: bun run test
 
   build:
