@@ -34,12 +34,13 @@ jobs:
 
       - name: Build container image
         run: |
-          podman build -t tarot-api:latest -f Containerfile .
+          docker build -t tarot-api:latest -f Containerfile .
 
       - name: Test container
         run: |
-          podman run -d --name tarot-test -p 3000:3000 tarot-api:latest
+          docker run -d --name tarot-test -p 3000:3000 tarot-api:latest
           sleep 5
           curl -f http://localhost:3000/api/cards || exit 1
-          podman stop tarot-test
+          docker stop tarot-test
+          docker rm tarot-test
           podman rm tarot-test
