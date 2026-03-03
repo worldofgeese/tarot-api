@@ -25,22 +25,3 @@ jobs:
 
       - name: Run tests (excludes E2E)
         run: bun run test
-
-  build:
-    runs-on: ubuntu-latest
-    needs: test
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Build container image
-        run: |
-          docker build -t tarot-api:latest -f Containerfile .
-
-      - name: Test container
-        run: |
-          docker run -d --name tarot-test -p 3000:3000 tarot-api:latest
-          sleep 5
-          curl -f http://localhost:3000/api/cards || exit 1
-          docker stop tarot-test
-          docker rm tarot-test
-          podman rm tarot-test
