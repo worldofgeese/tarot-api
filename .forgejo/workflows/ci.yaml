@@ -24,7 +24,7 @@ jobs:
         run: bun run seed
 
       - name: Run tests
-        run: bun test
+        run: bun run test
 
   build:
     runs-on: ubuntu-latest
