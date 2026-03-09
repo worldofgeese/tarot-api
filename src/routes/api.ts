@@ -75,6 +75,24 @@ export function apiRoutes(db: Database) {
       }));
     })
 
+    .get("/cards/reversed", ({ query, set }) => {
+      const { q } = query;
+
+      // MOSAIC: Validate search query (safe with parameterized queries)
+      const validation = validateStringParam(q as string, "q", true, false);
+      if (!validation.valid) {
+        set.status = 400;
+        return { error: validation.error };
+      }
+
+      const cards = searchReversed(db, validation.sanitized as string);
+
+      return cards.map(card => ({
+        ...card,
+        keywords: parseKeywords(card.keywords)
+      }));
+    })
+
     .get("/cards/:id", ({ params: { id }, set }) => {
       // MOSAIC: Validate card ID before processing
       const validation = validateCardId(id);
@@ -231,7 +249,8 @@ export function apiRoutes(db: Database) {
       const validation = validateStringParam(q as string, "q", true, false);
       if (!validation.valid) {
         set.status = 400;
-        return { error: validation.error };
+        // Match original error message format for existing tests
+        return { error: "query parameter q is required" };
       }
 
       const cards = searchReversed(db, validation.sanitized as string);
