@@ -12,8 +12,6 @@ const VERSION = packageJson.version;
 function parseKeywords(keywords: string | null): string[] {
   return keywords ? JSON.parse(keywords) : [];
 }
-
-export function apiRoutes(db: Database) {
   return new Elysia({ prefix: "/api" })
     .get("/health", () => {
       let database = "connected";
@@ -226,6 +224,22 @@ export function apiRoutes(db: Database) {
       return cards.map(card => ({
         ...card,
         keywords: parseKeywords(card.keywords)
+      }));
+    })
+
+    .get("/cards/reversed", ({ query, set }) => {
+      const { q } = query;
+
+      if (!q || (q as string).trim() === "") {
+        set.status = 400;
+        return { error: "query parameter q is required" };
+      }
+
+      const cards = searchReversed(db, q as string);
+
+      return cards.map(card => ({
+        ...card,
+        keywords: JSON.parse(card.keywords)
       }));
     })
 
