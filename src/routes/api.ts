@@ -4,6 +4,7 @@ import { getSpreadByType, type Card } from "../lib/spread";
 import { getSpread, listSpreads } from "../spreads";
 import { getDailyCard } from "../lib/daily";
 import { searchReversed } from "../lib/reversed";
+import { validateStringParam, validateCardId } from "../middleware/validate";
 
 // Read version from package.json at module level
 import packageJson from "../../package.json";
@@ -12,6 +13,8 @@ const VERSION = packageJson.version;
 function parseKeywords(keywords: string | null): string[] {
   return keywords ? JSON.parse(keywords) : [];
 }
+
+export function apiRoutes(db: Database) {
   return new Elysia({ prefix: "/api" })
     .get("/health", () => {
       let database = "connected";
@@ -73,13 +76,14 @@ function parseKeywords(keywords: string | null): string[] {
     })
 
     .get("/cards/:id", ({ params: { id }, set }) => {
-      const numericId = parseInt(id);
-
-      if (isNaN(numericId)) {
+      // MOSAIC: Validate card ID before processing
+      const validation = validateCardId(id);
+      if (!validation.valid) {
         set.status = 400;
-        return { error: "Invalid id" };
+        return { error: validation.error };
       }
 
+      const numericId = parseInt(id);
       const query = db.query("SELECT * FROM cards WHERE id = ?");
       const card = query.get(numericId) as Card | null;
 
@@ -110,9 +114,11 @@ function parseKeywords(keywords: string | null): string[] {
     .get("/search", ({ query, set }) => {
       const { q } = query;
 
-      if (!q || (q as string).trim() === "") {
+      // MOSAIC: Validate search query (no sanitization for FTS syntax)
+      const validation = validateStringParam(q as string, "q", true, false);
+      if (!validation.valid) {
         set.status = 400;
-        return { error: "Query parameter 'q' is required" };
+        return { error: validation.error };
       }
 
       const searchQuery = db.query(`
@@ -122,12 +128,17 @@ function parseKeywords(keywords: string | null): string[] {
         ORDER BY rank
       `);
 
-      const cards = searchQuery.all(q) as Card[];
+      try {
+        const cards = searchQuery.all(validation.sanitized) as Card[];
 
-      return cards.map(card => ({
-        ...card,
-        keywords: parseKeywords(card.keywords)
-      }));
+        return cards.map(card => ({
+          ...card,
+          keywords: parseKeywords(card.keywords)
+        }));
+      } catch (error) {
+        // FTS syntax errors return empty results
+        return [];
+      }
     })
 
     .get("/stats", () => {
@@ -191,12 +202,14 @@ function parseKeywords(keywords: string | null): string[] {
     .get("/cards/search", ({ query, set }) => {
       const { q } = query;
 
-      if (!q || (q as string).trim() === "") {
+      // MOSAIC: Validate search query (LIKE is safe with params)
+      const validation = validateStringParam(q as string, "q", true, false);
+      if (!validation.valid) {
         set.status = 400;
-        return { error: "Query parameter 'q' is required" };
+        return { error: validation.error };
       }
 
-      const searchTerm = `%${q}%`;
+      const searchTerm = `%${validation.sanitized}%`;
       const searchQuery = db.query(`
         SELECT * FROM cards
         WHERE name LIKE ? COLLATE NOCASE OR keywords LIKE ? COLLATE NOCASE
@@ -214,32 +227,18 @@ function parseKeywords(keywords: string | null): string[] {
     .get("/cards/reversed", ({ query, set }) => {
       const { q } = query;
 
-      if (!q || (q as string).trim() === "") {
+      // MOSAIC: Validate search query (safe with parameterized queries)
+      const validation = validateStringParam(q as string, "q", true, false);
+      if (!validation.valid) {
         set.status = 400;
-        return { error: "query parameter q is required" };
+        return { error: validation.error };
       }
 
-      const cards = searchReversed(db, q as string);
+      const cards = searchReversed(db, validation.sanitized as string);
 
       return cards.map(card => ({
         ...card,
         keywords: parseKeywords(card.keywords)
-      }));
-    })
-
-    .get("/cards/reversed", ({ query, set }) => {
-      const { q } = query;
-
-      if (!q || (q as string).trim() === "") {
-        set.status = 400;
-        return { error: "query parameter q is required" };
-      }
-
-      const cards = searchReversed(db, q as string);
-
-      return cards.map(card => ({
-        ...card,
-        keywords: JSON.parse(card.keywords)
       }));
     })
 
