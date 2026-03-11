@@ -93,6 +93,45 @@ export function apiRoutes(db: Database) {
       }));
     })
 
+    .get("/cards/element/:element", ({ params: { element }, set }) => {
+      // MOSAIC: Validate element parameter
+      const validation = validateStringParam(element, "element", true, false);
+      if (!validation.valid) {
+        set.status = 400;
+        return { error: validation.error };
+      }
+
+      const normalizedElement = validation.sanitized?.toLowerCase();
+
+      // Map elements to suits (lowercase to match database)
+      const elementToSuit: Record<string, string> = {
+        fire: "wands",
+        water: "cups",
+        air: "swords",
+        earth: "pentacles"
+      };
+
+      const suit = elementToSuit[normalizedElement as string];
+
+      if (!suit) {
+        set.status = 400;
+        return { error: "Invalid element. Must be one of: fire, water, air, earth" };
+      }
+
+      // Query cards by suit (excludes Major Arcana which have null/empty suit)
+      const query = db.query(`
+        SELECT * FROM cards
+        WHERE suit = ? COLLATE NOCASE
+        ORDER BY number ASC
+      `);
+      const cards = query.all(suit) as Card[];
+
+      return cards.map(card => ({
+        ...card,
+        keywords: parseKeywords(card.keywords)
+      }));
+    })
+
     .get("/cards/:id", ({ params: { id }, set }) => {
       // MOSAIC: Validate card ID before processing
       const validation = validateCardId(id);
