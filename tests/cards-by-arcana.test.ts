@@ -63,9 +63,9 @@ describe("Cards by Arcana Endpoint Tests", () => {
     expect(data.length).toBe(22);
   });
 
-  test("GET /api/cards/arcana/invalid returns 400 status", async () => {
+  test("GET /api/cards/arcana/invalid returns 404 status", async () => {
     const response = await fetch(`${baseUrl}/api/cards/arcana/invalid`);
-    expect(response.status).toBe(400);
+    expect(response.status).toBe(404);
   });
 
   test("GET /api/cards/arcana/invalid returns error message", async () => {

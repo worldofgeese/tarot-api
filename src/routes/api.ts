@@ -305,7 +305,7 @@ export function apiRoutes(db: Database) {
       const normalizedType = type.toLowerCase();
 
       if (normalizedType !== "major" && normalizedType !== "minor") {
-        set.status = 400;
+        set.status = 404;
         return { error: "Invalid arcana type. Use 'major' or 'minor'" };
       }
 
