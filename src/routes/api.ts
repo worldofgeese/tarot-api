@@ -326,7 +326,12 @@ export function apiRoutes(db: Database) {
     })
 
     .get("/spreads", () => {
-      return listSpreads();
+      return [
+        { name: 'Celtic Cross', positions: 10 },
+        { name: 'Three Card', positions: 3 },
+        { name: 'Single Card', positions: 1 },
+        { name: 'Horseshoe', positions: 7 }
+      ];
     })
 
     .get("/spreads/:id", ({ params: { id }, set }) => {

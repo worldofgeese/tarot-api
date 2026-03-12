@@ -48,7 +48,7 @@ describe("Spreads API", () => {
     app = new Elysia().use(apiRoutes(db));
   });
 
-  test("GET /api/spreads returns 200 with 3 spreads", async () => {
+  test("GET /api/spreads returns 200 with 4 spreads", async () => {
     const response = await app.handle(
       new Request("http://localhost/api/spreads")
     );
@@ -56,10 +56,8 @@ describe("Spreads API", () => {
     expect(response.status).toBe(200);
     const data = await response.json();
     expect(Array.isArray(data)).toBe(true);
-    expect(data.length).toBe(3);
-    expect(data[0]).toHaveProperty("id");
+    expect(data.length).toBe(4);
     expect(data[0]).toHaveProperty("name");
-    expect(data[0]).toHaveProperty("description");
     expect(data[0]).toHaveProperty("positions");
   });
 

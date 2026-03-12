@@ -1,0 +1,18 @@
+{
+  "initialized": true,
+  "repoFingerprint": {
+    "method": "remote-origin",
+    "raw": "ssh://forgejo@paphos.hound-celsius.ts.net/kypris/tarot-api.git",
+    "normalized": "paphos.hound-celsius.ts.net/kypris/tarot-api",
+    "hash": "8fbc37cb4db6db55"
+  },
+  "isCoordinator": true,
+  "fleetSize": 1,
+  "totalSlots": 6,
+  "localSlots": 6,
+  "mode": "solo",
+  "peers": [],
+  "dispatchOrder": [],
+  "lastSyncAt": "2026-03-12T17:29:00.114Z",
+  "updatedAt": "2026-03-12T17:29:00.117Z"
+}

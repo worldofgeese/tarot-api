@@ -1,0 +1,14 @@
+{
+  "attempts": {},
+  "last_executor_sync": "2026-03-12T17:29:30.225Z",
+  "executor_mode": "internal",
+  "active_slots": "0/3",
+  "review_tasks": [],
+  "manual_review_tasks": [],
+  "counts": {
+    "running": 0,
+    "review": 0,
+    "error": 0,
+    "manual_review": 0
+  }
+}

@@ -18,3 +18,4 @@ node_modules/
 !.decapod/generated/specs/
 !.decapod/generated/specs/*.md
 !.decapod/generated/specs/.manifest.json
+/.bosun/
