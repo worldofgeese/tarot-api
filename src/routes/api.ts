@@ -266,7 +266,39 @@ export function apiRoutes(db: Database) {
       return countNum === 1 ? formattedCards[0] : formattedCards;
     })
 
-    .get("/daily", () => {
+    .get("/daily", ({ query, set }) => {
+      const { date: dateParam } = query;
+
+      // Validate date parameter if provided
+      if (dateParam) {
+        const dateStr = dateParam as string;
+
+        // Validate YYYY-MM-DD format
+        const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+        if (!dateRegex.test(dateStr)) {
+          set.status = 400;
+          return { error: "Invalid date format. Use YYYY-MM-DD" };
+        }
+
+        // Validate that it's a valid date
+        const parsedDate = new Date(dateStr + "T00:00:00Z");
+        if (isNaN(parsedDate.getTime())) {
+          set.status = 400;
+          return { error: "Invalid date format. Use YYYY-MM-DD" };
+        }
+
+        // Use the provided date
+        const { card, date, reversed } = getDailyCard(db, parsedDate);
+
+        return {
+          ...card,
+          keywords: parseKeywords(card.keywords),
+          date,
+          reversed
+        };
+      }
+
+      // No date parameter, use today's date
       const { card, date, reversed } = getDailyCard(db);
 
       return {
