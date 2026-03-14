@@ -156,8 +156,28 @@ export function apiRoutes(db: Database) {
       };
     })
 
-    .get("/spread/:type", ({ params: { type }, set }) => {
+    .get("/spread/:type", ({ params: { type }, query, set }) => {
       try {
+        // Special handling for "single" type with count parameter
+        if (type === "single" && query.count !== undefined) {
+          const countStr = query.count as string;
+          const count = parseInt(countStr);
+
+          // Validate count is numeric and in range 1-10
+          if (isNaN(count) || count < 1 || count > 10) {
+            set.status = 400;
+            return { error: "Count must be between 1 and 10" };
+          }
+
+          // Draw the specified number of cards
+          const cards = getSpreadByType(db, type, count);
+          return cards.map(card => ({
+            ...card,
+            keywords: parseKeywords(card.keywords)
+          }));
+        }
+
+        // Default behavior for all other types or single without count
         const cards = getSpreadByType(db, type);
         return cards.map(card => ({
           ...card,

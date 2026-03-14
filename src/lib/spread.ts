@@ -17,10 +17,11 @@ export function drawSpread(db: Database, count: number): Card[] {
   return query.all(count) as Card[];
 }
 
-export function getSpreadByType(db: Database, type: string): Card[] {
+export function getSpreadByType(db: Database, type: string, count?: number): Card[] {
   switch (type) {
     case "single":
-      return drawSpread(db, 1);
+      // Use provided count if available, otherwise default to 1
+      return drawSpread(db, count ?? 1);
     case "3-card":
       return drawSpread(db, 3);
     case "celtic-cross":
