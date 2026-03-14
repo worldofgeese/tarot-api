@@ -76,6 +76,49 @@ describe("API Integration Tests", () => {
     expect(data.length).toBe(1);
   });
 
+  test("GET /api/spread/single?count=1 returns 1 card", async () => {
+    const response = await fetch(`${baseUrl}/api/spread/single?count=1`);
+    expect(response.status).toBe(200);
+
+    const data = await response.json();
+    expect(Array.isArray(data)).toBe(true);
+    expect(data.length).toBe(1);
+  });
+
+  test("GET /api/spread/single?count=3 returns 3 cards", async () => {
+    const response = await fetch(`${baseUrl}/api/spread/single?count=3`);
+    expect(response.status).toBe(200);
+
+    const data = await response.json();
+    expect(Array.isArray(data)).toBe(true);
+    expect(data.length).toBe(3);
+  });
+
+  test("GET /api/spread/single with no count defaults to 1", async () => {
+    const response = await fetch(`${baseUrl}/api/spread/single`);
+    expect(response.status).toBe(200);
+
+    const data = await response.json();
+    expect(Array.isArray(data)).toBe(true);
+    expect(data.length).toBe(1);
+  });
+
+  test("GET /api/spread/single?count=0 returns 400", async () => {
+    const response = await fetch(`${baseUrl}/api/spread/single?count=0`);
+    expect(response.status).toBe(400);
+
+    const data = await response.json();
+    expect(data).toHaveProperty("error");
+  });
+
+  test("GET /api/spread/single?count=11 returns 400", async () => {
+    const response = await fetch(`${baseUrl}/api/spread/single?count=11`);
+    expect(response.status).toBe(400);
+
+    const data = await response.json();
+    expect(data).toHaveProperty("error");
+  });
+
   test("GET /api/search with empty query returns error", async () => {
     const response = await fetch(`${baseUrl}/api/search?q=`);
     expect(response.status).toBe(400);
