@@ -1,5 +1,10 @@
 import { beforeAll, afterAll } from "bun:test";
 
+const devboxChromium = "/home/node/.openclaw/devbox-env/.devbox/nix/profile/default/bin/chromium";
+if (!process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH) {
+  process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH = devboxChromium;
+}
+
 let serverProcess: any;
 
 beforeAll(async () => {

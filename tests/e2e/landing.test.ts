@@ -1,8 +1,10 @@
+const PW_EXEC = process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH || "/home/node/.openclaw/devbox-env/.devbox/nix/profile/default/bin/chromium";
+
 import { test, expect } from "bun:test";
 import { chromium } from "playwright";
 
 test("landing page shows 78 card tiles", async () => {
-  const browser = await chromium.launch();
+  const browser = await chromium.launch({ executablePath: PW_EXEC });
   const context = await browser.newContext();
   const page = await context.newPage();
 
@@ -19,7 +21,7 @@ test("landing page shows 78 card tiles", async () => {
 });
 
 test("landing page has correct title", async () => {
-  const browser = await chromium.launch();
+  const browser = await chromium.launch({ executablePath: PW_EXEC });
   const context = await browser.newContext();
   const page = await context.newPage();
 
@@ -32,7 +34,7 @@ test("landing page has correct title", async () => {
 });
 
 test("card tiles are clickable", async () => {
-  const browser = await chromium.launch();
+  const browser = await chromium.launch({ executablePath: PW_EXEC });
   const context = await browser.newContext();
   const page = await context.newPage();
 
