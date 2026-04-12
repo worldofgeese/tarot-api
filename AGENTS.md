@@ -74,3 +74,12 @@ decapod eval plan --task-set-id <id> --task-ref <task-id> --model-id <model> --p
 - Use `decapod docs search --query \"<problem>\" --op <op> --path <path> --tag <tag>` or `decapod rpc --op context.scope --params '{\"query\":\"...\"}'` for scoped just-in-time constitution context.
 - Use `decapod todo handoff --id <id> --to <agent>` for cross-agent ownership transfer.
 - Treat lock/contention failures (including `VALIDATE_TIMEOUT_OR_LOCK`) as blocking until resolved.
+
+## SDLC Pipeline
+
+- **TDD is non-negotiable.** Write failing tests first. Commit. Then implement. Separate commits.
+- **Dispatch via ACP** with `streamTo: "parent"` for visibility. One task per agent, branch per task.
+- **Gates:** Gate 0 (lint) → Gate 0.5 (Architect Lens + Decapod preflight) → Gate 1 (structural) → Manual exercise → Gate 2 (judge) → Gate 2.5 (Architect Lens full) → Gate 3 (CI) → Gate 4 (Council Review for non-trivial merges)
+- **Self-correction loop:** Mechanical review → judge → fix → re-judge (max 3 cycles). CI retries max 3 with model escalation.
+- **Council Review:** Multi-model 360° review required for non-trivial merges. See `scripts/council-review.py`.
+- **Deliverable report** on every completed task: what was requested, what happened, files changed, test coverage, self-review triage.
