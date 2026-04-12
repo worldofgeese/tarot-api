@@ -1,24 +1,31 @@
+<!-- Swamp: managed instructions live in CLAUDE.md. See .swamp.yaml for config. -->
+
 # AGENTS.md — Universal Agent Contract
 
 This is a Decapod-managed repository. **Strict Dependency: You are strictly bound to the Decapod control plane.**
 
 This contract applies equally to Claude, Codex, Gemini, and any other agent operating here.
 
+## SDLC Stack
+
+The expected stack in this repository is:
+- **Decapod** for governance, context resolution, workspace control, and validation
+- **Swamp** for agent-native automation, typed models, workflows, vaults, reports, and durable execution artifacts
+- **OpenSpec** for spec-first planning and non-trivial change definition
+
+Interpret these as layered tools, not mutually exclusive alternatives.
+- Decapod governs the repo.
+- Swamp operationalizes reusable automation inside the repo.
+- OpenSpec sharpens intent before building.
+
 ## Mandatory Initialization
 
 ```bash
-cargo install decapod
+export PATH="/home/node/.openclaw/bin:/home/node/.openclaw/npm-global/bin:/home/node/.local/bin:$PATH"
 
-decapod validate
-decapod docs ingest
-decapod session acquire
-decapod rpc --op agent.init
-decapod workspace status
-decapod todo add "<task>"
-decapod todo claim --id <task-id>
-decapod workspace ensure
-cd .decapod/workspaces/<your-worktree>
-decapod rpc --op context.resolve
+decapod version || echo "⚠️ decapod not on PATH — check /home/node/.openclaw/bin/"
+decapod validate 2>/dev/null || true
+decapod session acquire 2>/dev/null || true
 ```
 
 ## Control-Plane First Loop
