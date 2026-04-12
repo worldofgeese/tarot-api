@@ -1,0 +1,15 @@
+type: command/shell
+typeVersion: 2026.02.09.1
+id: 017ed471-ac7b-4bd6-9a9d-b219e12fd382
+name: tarot-api-health
+version: 1
+tags:
+  repo: tarot-api
+  purpose: health-check
+globalArguments: {}
+methods:
+  execute:
+    arguments:
+      run: bun test tests/health.test.ts
+      workingDir: /home/node/.openclaw/workspace/projects/tarot-api
+      timeout: 120000
