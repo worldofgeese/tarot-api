@@ -3,14 +3,17 @@
   "sandbox": "agent",
   "steps": {
     "work": {
-      "pre": ["python scripts/check_impact_map.py TASK.md || echo '⚠️  Impact Map check failed - template missing'"],
+      "pre": [
+        "python scripts/check_impact_map.py TASK.md || echo '⚠️  Impact Map check failed - template missing'",
+        "python scripts/check_tdd_evidence.py TASK.md || echo '⚠️  TDD evidence check failed - see scripts/check_tdd_evidence.py'"
+      ],
       "post": ["python scripts/check_design_boundaries.py TASK.md || echo '⚠️  Design Boundaries check failed - template missing'"]
     },
     "review": {
       "script": "python scripts/behavioral_review.py"
     },
     "gate": {
-      "script": "python scripts/check_completion.py TASK.md"
+      "script": "python scripts/check_completion.py TASK.md && python scripts/check_decapod_validation.py"
     },
     "iterate": {
       "description": "Re-run failed checks and fix issues"
