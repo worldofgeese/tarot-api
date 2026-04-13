@@ -24,7 +24,7 @@ mkdir -p reports
 REPORT_FILE="reports/behavioral-review-$(date +%Y%m%d-%H%M%S).md"
 
 # Start report
-cat > "$REPORT_FILE" <<'EOF'
+cat > "$REPORT_FILE" <<EOF
 # Behavioral Review Report
 
 **Date**: $(date '+%Y-%m-%d %H:%M:%S')

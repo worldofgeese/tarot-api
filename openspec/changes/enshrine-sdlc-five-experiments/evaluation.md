@@ -8,16 +8,16 @@
 
 ## Executive Summary
 
-All five SDLC experiments successfully enshrined in tarot-api through concrete repo artifacts:
+This branch materially enshrines all five SDLC experiments in tarot-api through concrete repo artifacts:
 - **4 workflow templates** created (`.decapod/templates/`)
 - **4 validation scripts** created (`scripts/`)
 - **Cook orchestration** enhanced with workflow step integration
 - **E2E test path fixed** (separated unit from E2E, managed server)
 - **Comprehensive documentation** created (`docs/workflow/sdlc-experiments.md`)
-- **All tests pass** (156 unit tests, 10 E2E tests)
+- **All repo tests pass** (156 unit tests, 10 E2E tests)
 - **Behavioral review** automated and verified
 
-The repo is now the first honest implementation of the promoted SDLC stack where the experiments are load-bearing, not decorative.
+Honest caveat: the branch is functionally strong but not fully Decapod-clean yet. `decapod validate` still reports governance/contract failures unrelated to product behavior, so this is a substantial workflow win, not a fully green governance finish.
 
 ---
 
@@ -112,8 +112,8 @@ The repo is now the first honest implementation of the promoted SDLC stack where
   - All 25 items marked complete with concrete evidence
   - **Test evidence**: "156 pass, 0 fail, 1365 expect() calls"
   - **E2E evidence**: "10 pass, 0 fail, 12 expect() calls"
-  - **Behavioral review evidence**: Report path `reports/behavioral-review-20260413-083332.md`
-  - **Decapod validation**: "pass=129 fail=20 warn=5"
+  - **Behavioral review evidence**: Report path `reports/behavioral-review-20260413-091410.md`
+  - **Decapod validation**: `pass=149 fail=24 warn=5` (attempted and reported honestly; not green)
   - **Self-review concerns**: 3 documented (validation script patterns, Cook auto-execution, template maintenance burden)
 - **Validation script tested**: `bash scripts/check-completion.sh TASK.md` → ⚠️  8 items initially incomplete, all resolved before final commit
 
@@ -158,7 +158,7 @@ Current checklist is excellent for this task size but would create friction for 
 #### Evidence of Usage
 - **Script executed successfully**: `bash scripts/behavioral-review.sh` → ✅ passed
   - **Test result**: All 10 E2E tests passed
-  - **Report generated**: `reports/behavioral-review-20260413-083332.md` (70 lines)
+  - **Report generated**: `reports/behavioral-review-20260413-091410.md` (70 lines)
   - **Observations documented**: 
     - 3 pages tested (landing, card detail, spread)
     - 4 functionality items verified (card rendering, detail pages, spread drawing, 404 handling)
@@ -266,9 +266,9 @@ Current checklist is excellent for this task size but would create friction for 
 ### Tests and Verification
 - **Unit tests**: 156 tests passed, 0 failures, 1365 assertions
 - **E2E tests**: 10 tests passed, 0 failures, 12 assertions
-- **Behavioral review**: 1 report generated, all tests passed
+- **Behavioral review**: 1 current report generated, all tests passed
 - **Validation scripts**: 3 scripts, all passed on TASK.md
-- **Decapod validation**: 129 passed, 20 failed (non-blocking: missing GEMINI.md/CODEX.md)
+- **Decapod validation**: attempted from worktree, `149 passed / 24 failed / 5 warned`; remaining failures are governance/contract issues, so do not treat this branch as Decapod-green
 
 ### Time Investment
 - **Estimated**: 3.75 hours (225 minutes)
@@ -346,13 +346,13 @@ Current checklist is excellent for this task size but would create friction for 
 
 ## Conclusion
 
-All five experiments successfully enshrined. The repo is now an honest implementation of the promoted SDLC stack where:
+All five experiments are materially represented on this branch. The repo now has a much more load-bearing SDLC surface where:
 - Impact Map and Design Boundaries force scope clarity **before** coding
 - Resource Headroom improves estimation accuracy
 - Behavioral Review provides automated user-facing validation **after** code review
 - Completion Checklist with evidence prevents premature "done" declarations
 
-**tarot-api is now the proving ground for SDLC stack load-bearing usage.**
+Honest limit: this branch is a strong proving-ground iteration, not a fully green governance finish. Tarot-api now demonstrates the workflow patterns in practice, but Decapod contract cleanup still remains before I would call it completely done.
 
 ---
 
