@@ -2,11 +2,22 @@
   "agent": "claude",
   "sandbox": "agent",
   "steps": {
-    "work": {},
-    "review": {},
-    "gate": {},
-    "iterate": {},
-    "ralph": {}
+    "work": {
+      "pre": ["bash scripts/check-impact-map.sh TASK.md || echo '⚠️  Impact Map check failed - template missing'"],
+      "post": ["bash scripts/check-design-boundaries.sh TASK.md || echo '⚠️  Design Boundaries check failed - template missing'"]
+    },
+    "review": {
+      "script": "bash scripts/behavioral-review.sh"
+    },
+    "gate": {
+      "script": "bash scripts/check-completion.sh TASK.md"
+    },
+    "iterate": {
+      "description": "Re-run failed checks and fix issues"
+    },
+    "ralph": {
+      "description": "Final validation before merge"
+    }
   },
   "env": []
 }

@@ -6,10 +6,9 @@
   "scripts": {
     "dev": "bun run --watch src/index.ts",
     "start": "bun run src/index.ts",
-    "test": "bun test $(find tests -maxdepth 1 -name '*.test.ts')",
+    "test": "bun test tests/api.test.ts tests/card*.test.ts tests/daily.test.ts tests/element*.test.ts tests/health.test.ts tests/random.test.ts tests/reversed.test.ts tests/search.test.ts tests/security.test.ts tests/spread*.test.ts tests/stats.test.ts",
     "test:e2e": "bash scripts/test-e2e.sh",
-    "test:all": "bun test $(find tests -maxdepth 1 -name '*.test.ts') && bash scripts/test-e2e.sh",
-    "e2e": "source /home/node/.openclaw/devbox-env/lib/playwright-env.sh && bun test --preload ./tests/e2e/setup.ts tests/e2e/",
+    "test:all": "bun run test && bun run test:e2e",
     "seed": "bun run src/db/seed.ts",
     "build-data": "bun run src/db/seed.ts"
   },
