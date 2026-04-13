@@ -57,6 +57,8 @@ The expected stack in this repository is:
 
 ## SDLC Pipeline
 
+- **OpenSpec comes first** for non-trivial features / API changes.
+- **Immediately after OpenSpec, use the `tdd` skill** (upstream: `https://github.com/mfranzon/tdd`) as the canonical red-green-refactor loop for implementation work.
 - **TDD is non-negotiable.** Write failing tests first, then implement, then keep test and implementation commits separate.
 - **Dispatch via ACP** with `streamTo: "parent"` for visibility. One task per agent, branch per task.
 - **Gate stack:** Gate 0 (lint) → Gate 0.5 (Architect Lens + Decapod preflight) → Gate 1 (structural) → Manual exercise → Gate 2 (judge) → Gate 2.5 (Architect Lens full) → Gate 3 (CI) → Gate 4 (Council Review for non-trivial merges).

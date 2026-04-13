@@ -12,9 +12,18 @@ The five experiments address different phases of the development workflow:
 4. **EX-012**: Behavioral Review — User-facing validation
 5. **EX-014**: Resource Headroom — Estimation and overrun detection
 
-Together, these experiments enforce: **OpenSpec → Impact Map → Design → TDD → Implementation → Behavioral Review → Completion → Merge**
+Together, these experiments enforce: **OpenSpec → `tdd` skill → Impact Map → Design → TDD → Implementation → Behavioral Review → Completion → Merge**
 
 ---
+
+## TDD Position in the Stack
+
+For implementation work in this repo, TDD is not just a vague principle. After OpenSpec drafts the change, agents should use the `tdd` skill (upstream: `https://github.com/mfranzon/tdd`) as the canonical red-green-refactor loop before proceeding through the rest of the stack.
+
+This means:
+- OpenSpec defines the change and tasks.
+- `tdd` structures implementation into small increments.
+- The five experiments then surround that work with planning, boundaries, behavioral review, and evidence.
 
 ## EX-005: Plan-Before-Code Impact Map Gate
 
