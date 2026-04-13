@@ -66,10 +66,12 @@ The expected stack in this repository is:
 
 ## Five SDLC Experiments
 
-- **EX-005 Impact Map** — template: `.decapod/templates/impact-map.md`, validate with `bash scripts/check-impact-map.sh TASK.md`
-- **EX-006 Design Boundaries** — template: `.decapod/templates/design-boundaries.md`, validate with `bash scripts/check-design-boundaries.sh TASK.md`
-- **EX-007 Completion Checklist** — template: `.decapod/templates/completion-checklist.md`, validate with `bash scripts/check-completion.sh TASK.md`
-- **EX-012 Behavioral Review** — script: `bash scripts/behavioral-review.sh`, reports written under `reports/`
+All validation scripts are Python (`.decapod/scripts/` or `scripts/`). Shell scripts are policy violations.
+
+- **EX-005 Impact Map** — template: `.decapod/templates/impact-map.md`, validate with `python scripts/check_impact_map.py TASK.md`
+- **EX-006 Design Boundaries** — template: `.decapod/templates/design-boundaries.md`, validate with `python scripts/check_design_boundaries.py TASK.md`
+- **EX-007 Completion Checklist** — template: `.decapod/templates/completion-checklist.md`, validate with `python scripts/check_completion.py TASK.md`
+- **EX-012 Behavioral Review** — script: `python scripts/behavioral_review.py`, reports written under `reports/`
 - **EX-014 Resource Headroom** — template: `.decapod/templates/resource-headroom.md`
 
 Cook orchestration lives in `.cook/config.json`. Detailed workflow notes live in `docs/workflow/sdlc-experiments.md`.

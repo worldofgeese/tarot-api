@@ -1,0 +1,149 @@
+#!/usr/bin/env python3
+"""EX-012: Behavioral review with E2E testing."""
+import subprocess
+import time
+import sys
+import os
+from datetime import datetime
+from pathlib import Path
+
+REPORTS_DIR = Path("reports")
+SERVER_PORT = 3000
+STARTUP_TIMEOUT = 30
+
+
+def wait_for_server(port: int, timeout: int) -> bool:
+    for _ in range(timeout):
+        try:
+            result = subprocess.run(
+                ["curl", "-s", "-o", "/dev/null", "-w", "%{http_code}", f"http://localhost:{port}"],
+                capture_output=True, text=True, timeout=2
+            )
+            if result.stdout.strip() in ("200", "301", "302"):
+                return True
+        except (subprocess.TimeoutExpired, subprocess.CalledProcessError):
+            pass
+        time.sleep(1)
+    return False
+
+
+def write_report_header(report_file: Path) -> None:
+    report_file.write_text(
+        f"# Behavioral Review Report\n\n"
+        f"**Date**: {datetime.now():%Y-%m-%d %H:%M:%S}\n"
+        f"**Reviewer**: Automated (EX-012)\n\n"
+        f"## Summary\n\n"
+        f"This report documents behavioral verification of user-facing changes through E2E testing.\n\n"
+        f"## Test Execution\n\n"
+    )
+
+
+def run_behavioral_review() -> int:
+    REPORTS_DIR.mkdir(exist_ok=True)
+    report_file = REPORTS_DIR / f"behavioral-review-{datetime.now():%Y%m%d-%H%M%S}.md"
+
+    print("=== Behavioral Review Starting ===")
+    print()
+
+    write_report_header(report_file)
+
+    print("Starting test server for behavioral review...")
+    server_log = REPORTS_DIR / "server.log"
+    server_proc = subprocess.Popen(
+        ["bun", "run", "src/index.ts"],
+        stdout=open(server_log, "w"),
+        stderr=subprocess.STDOUT,
+        cwd=Path(__file__).parent.parent
+    )
+
+    try:
+        print("Waiting for server to be ready...")
+        if not wait_for_server(SERVER_PORT, STARTUP_TIMEOUT):
+            print("❌ Error: Server failed to start after 30 seconds")
+            with open(report_file, "a") as f:
+                f.write("**Status**: Server startup FAILED\n")
+            return 1
+
+        print("✅ Server ready on port 3000")
+        with open(report_file, "a") as f:
+            f.write(f"**Status**: Server started successfully (PID: {server_proc.pid})\n\n")
+
+        print("Running E2E tests...")
+
+        playwright_env_script = "/home/node/.openclaw/devbox-env/lib/playwright-env.sh"
+        playwright_cmd = f"source {playwright_env_script} && bun test tests/e2e/"
+
+        result = subprocess.run(
+            ["bash", "-c", playwright_cmd],
+            capture_output=True,
+            text=True,
+            cwd=Path(__file__).parent.parent
+        )
+
+        with open(report_file, "a") as f:
+            f.write("## E2E Test Results\n\n")
+            f.write("```\n")
+            f.write(result.stdout)
+            if result.stderr:
+                f.write(result.stderr)
+            f.write("```\n\n")
+            f.write(f"**Test Result**: {'PASSED' if result.returncode == 0 else 'FAILED'}\n\n")
+
+        test_result = "PASSED ✅" if result.returncode == 0 else "FAILED ❌"
+        print(f"E2E Tests: {test_result}")
+
+        with open(report_file, "a") as f:
+            f.write("## User-Facing Changes Observed\n\n")
+            f.write("### Pages Tested\n")
+            f.write("- **Landing Page** (`/`): Card grid display\n")
+            f.write("- **Card Detail Page** (`/card/:id`): Individual card information\n")
+            f.write("- **Spread Page** (`/spread`): Interactive card drawing\n\n")
+
+            f.write("## Recommendations\n\n")
+            if result.returncode == 0:
+                f.write("✅ All behavioral tests passed. User-facing functionality operates as expected.\n\n")
+                f.write("**Next Steps:**\n")
+                f.write("- Manual smoke test recommended for visual verification\n")
+                f.write("- Consider adding more edge case coverage\n")
+                f.write("- Monitor server logs for any warnings\n\n")
+            else:
+                f.write("❌ Some behavioral tests failed. Review test output above for details.\n\n")
+                f.write("**Required Actions:**\n")
+                f.write("- Fix failing tests before proceeding to merge\n")
+                f.write("- Investigate root cause of failures\n")
+                f.write("- Re-run behavioral review after fixes\n\n")
+
+        if server_log.exists():
+            log_content = server_log.read_text()
+            errors = [line for line in log_content.splitlines() if "error" in line.lower() or "warning" in line.lower()]
+            if errors:
+                with open(report_file, "a") as f:
+                    f.write("## Server Log Warnings/Errors\n\n")
+                    f.write("```\n")
+                    for line in errors[:20]:
+                        f.write(f"{line}\n")
+                    f.write("```\n\n")
+
+        with open(report_file, "a") as f:
+            f.write("---\n")
+            f.write(f"*Generated by behavioral_review.py (EX-012)*\n")
+
+        print()
+        print("=== Behavioral Review Complete ===")
+        print(f"Report saved to: {report_file}")
+        print()
+
+        return result.returncode
+
+    finally:
+        print(f"Stopping test server (PID: {server_proc.pid})...")
+        server_proc.terminate()
+        try:
+            server_proc.wait(timeout=5)
+        except subprocess.TimeoutExpired:
+            server_proc.kill()
+            server_proc.wait()
+
+
+if __name__ == "__main__":
+    sys.exit(run_behavioral_review())

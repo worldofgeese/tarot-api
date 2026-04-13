@@ -6,8 +6,8 @@
   "scripts": {
     "dev": "bun run --watch src/index.ts",
     "start": "bun run src/index.ts",
-    "test": "bun test tests/api.test.ts tests/card*.test.ts tests/daily.test.ts tests/element*.test.ts tests/health.test.ts tests/random.test.ts tests/reversed.test.ts tests/search.test.ts tests/security.test.ts tests/spread*.test.ts tests/stats.test.ts",
-    "test:e2e": "bash scripts/test-e2e.sh",
+    "test": "bun test --bail $(find tests -maxdepth 1 -name '*.test.ts' | tr '\\n' ' ')",
+    "test:e2e": "python scripts/test_e2e.py",
     "test:all": "bun run test && bun run test:e2e",
     "seed": "bun run src/db/seed.ts",
     "build-data": "bun run src/db/seed.ts"

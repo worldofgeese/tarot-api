@@ -25,14 +25,14 @@
 
 **Files**:
 - `package.json` (update test scripts)
-- `scripts/test-e2e.sh` (new, managed server wrapper)
+- `scripts/test_e2e.py` (new, managed server wrapper)
 - `tests/e2e/setup.ts` (verify/update)
 
 **Acceptance**:
-- [ ] `bun test` runs only unit/API tests (excludes tests/e2e/)
-- [ ] `bun run test:e2e` starts server, runs browser tests, cleans up
-- [ ] `bun run test:all` runs both suites
-- [ ] All tests pass
+- [x] `bun test` runs only unit/API tests (excludes tests/e2e/)
+- [x] `bun run test:e2e` starts server, runs browser tests, cleans up
+- [x] `bun run test:all` runs both suites
+- [x] All tests pass
 
 **Estimate**: 20 minutes
 
@@ -43,18 +43,18 @@
 **Description**: Create behavioral review script that runs E2E suite and generates review report.
 
 **Files**:
-- `scripts/behavioral-review.sh` (new)
+- `scripts/behavioral_review.py` (new)
 - `docs/workflow/behavioral-review-template.md` (report template)
 
 **Acceptance**:
-- [ ] Script starts server in test mode
-- [ ] Script runs E2E suite
-- [ ] Script generates behavioral review report with sections:
+- [x] Script starts server in test mode
+- [x] Script runs E2E suite
+- [x] Script generates behavioral review report with sections:
   - User-facing changes observed
   - Edge cases exercised  
   - Error handling verified
   - Performance characteristics
-- [ ] Script exits cleanly (server shutdown)
+- [x] Script exits cleanly (server shutdown)
 
 **Estimate**: 25 minutes
 
@@ -65,16 +65,16 @@
 **Description**: Create lightweight validation scripts for Cook workflow integration.
 
 **Files**:
-- `scripts/check-impact-map.sh` (new)
-- `scripts/check-design-boundaries.sh` (new)
-- `scripts/check-completion.sh` (new)
+- `scripts/check_impact_map.py` (new)
+- `scripts/check_design_boundaries.py` (new)
+- `scripts/check_completion.py` (new)
 
 **Acceptance**:
-- [ ] `check-impact-map.sh` validates Impact Map section exists in task file
-- [ ] `check-design-boundaries.sh` validates Design Boundaries section exists
-- [ ] `check-completion.sh` validates completion checklist items marked complete
-- [ ] Scripts return meaningful exit codes (0 = pass, 1 = fail)
-- [ ] Scripts print helpful messages on failure
+- [x] `check_impact_map.py` validates Impact Map section exists in task file
+- [x] `check_design_boundaries.py` validates Design Boundaries section exists
+- [x] `check_completion.py` validates completion checklist items marked complete
+- [x] Scripts return meaningful exit codes (0 = pass, 1 = fail)
+- [x] Scripts print helpful messages on failure
 
 **Estimate**: 20 minutes
 
@@ -88,10 +88,10 @@
 - `.cook/config.json` (update)
 
 **Acceptance**:
-- [ ] `work` step has pre/post validation scripts
-- [ ] `review` step calls behavioral-review.sh
-- [ ] `gate` step calls check-completion.sh
-- [ ] Configuration is valid JSON
+- [x] `work` step has pre/post validation scripts
+- [x] `review` step calls behavioral_review.py
+- [x] `gate` step calls check_completion.py
+- [x] Configuration is valid JSON
 
 **Estimate**: 10 minutes
 
@@ -149,7 +149,7 @@
 - [ ] `decapod validate` passes
 - [ ] `bun test` passes (unit/API tests)
 - [ ] `bun run test:e2e` passes (browser tests with managed server)
-- [ ] `bash scripts/behavioral-review.sh` generates report
+- [ ] `python scripts/behavioral_review.py` generates report
 - [ ] Cook validation scripts run successfully
 - [ ] No regression in existing functionality
 

@@ -46,7 +46,7 @@ Surface scope, blast radius, and dependency impact BEFORE starting implementatio
 
 ### Validation
 ```bash
-bash scripts/check-impact-map.sh TASK.md
+python scripts/check_impact_map.py TASK.md
 ```
 
 ### Example
@@ -107,7 +107,7 @@ Explicitly define what's in scope, out of scope, and what constitutes scope cree
 
 ### Validation
 ```bash
-bash scripts/check-design-boundaries.sh TASK.md
+python scripts/check_design_boundaries.py TASK.md
 ```
 
 ### Example
@@ -173,7 +173,7 @@ Enforce thorough verification BEFORE claiming "done". Requires evidence for all 
 
 ### Validation
 ```bash
-bash scripts/check-completion.sh TASK.md
+python scripts/check_completion.py TASK.md
 ```
 
 ### Example
@@ -231,11 +231,11 @@ Verify user-facing behavior AFTER code review, catch behavioral regressions that
 - As part of Cook `review` step
 
 ### Artifact Location
-`scripts/behavioral-review.sh`
+`scripts/behavioral_review.py`
 
 ### Execution
 ```bash
-bash scripts/behavioral-review.sh
+python scripts/behavioral_review.py
 ```
 
 ### What It Does
@@ -364,14 +364,14 @@ The five experiments are integrated into Cook workflow steps via `.cook/config.j
 {
   "steps": {
     "work": {
-      "pre": ["bash scripts/check-impact-map.sh TASK.md"],
-      "post": ["bash scripts/check-design-boundaries.sh TASK.md"]
+      "pre": ["python scripts/check_impact_map.py TASK.md"],
+      "post": ["python scripts/check_design_boundaries.py TASK.md"]
     },
     "review": {
-      "script": "bash scripts/behavioral-review.sh"
+      "script": "python scripts/behavioral_review.py"
     },
     "gate": {
-      "script": "bash scripts/check-completion.sh TASK.md"
+      "script": "python scripts/check_completion.py TASK.md"
     }
   }
 }
@@ -409,7 +409,7 @@ Template flow:
    - Implement, commit separately
    
 5. **Run Behavioral Review** (EX-012)
-   - After code review, run `bash scripts/behavioral-review.sh`
+   - After code review, run `python scripts/behavioral_review.py`
    
 6. **Complete Checklist** (EX-007)
    - Mark all checklist items complete with evidence
@@ -423,16 +423,16 @@ Quick reference for all five experiment validations:
 
 ```bash
 # EX-005: Impact Map
-bash scripts/check-impact-map.sh TASK.md
+python scripts/check_impact_map.py TASK.md
 
 # EX-006: Design Boundaries
-bash scripts/check-design-boundaries.sh TASK.md
+python scripts/check_design_boundaries.py TASK.md
 
 # EX-007: Completion Checklist
-bash scripts/check-completion.sh TASK.md
+python scripts/check_completion.py TASK.md
 
 # EX-012: Behavioral Review
-bash scripts/behavioral-review.sh
+python scripts/behavioral_review.py
 
 # EX-014: Resource Headroom
 # (Checked as part of completion checklist)

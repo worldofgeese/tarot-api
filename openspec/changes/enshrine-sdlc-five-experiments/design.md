@@ -21,13 +21,13 @@
 │  ↓ executed via                              │
 ├─────────────────────────────────────────────┤
 │  Verification Scripts (scripts/)             │
-│  - test-e2e.sh (managed server + browser)    │
-│  - behavioral-review.sh (EX-012)             │
+│  - test_e2e.py (managed server + browser)    │
+│  - behavioral_review.py (EX-012)             │
 │  ↓ gates                                     │
 ├─────────────────────────────────────────────┤
 │  Cook Orchestration (.cook/config.json)     │
 │  - work step: check Impact Map exists        │
-│  - review step: run behavioral-review.sh     │
+│  - review step: run behavioral_review.py     │
 │  - gate step: completion checklist           │
 └─────────────────────────────────────────────┘
 ```
@@ -70,7 +70,7 @@
 **Integration**: TASK_*.md files include completion checklist. Scripts check for `[x]` completion markers.
 
 #### EX-012: Behavioral Review Pass After Code Review
-**Location**: `scripts/behavioral-review.sh`  
+**Location**: `scripts/behavioral_review.py`  
 **Enforcement**: Cook `review` step, called after code review, before CI  
 **Content**: Script that:
 1. Starts server in test mode
@@ -82,7 +82,7 @@
    - Error handling verified
    - Performance characteristics
 
-**Integration**: `.cook/config.json` `review` step calls `bash scripts/behavioral-review.sh`.
+**Integration**: `.cook/config.json` `review` step calls `python scripts/behavioral_review.py`.
 
 #### EX-014: Resource Headroom Annotations in Task Briefs
 **Location**: `.decapod/templates/resource-headroom.md`  
@@ -110,27 +110,26 @@ $ bun test
 
 **Solution**: Separate test commands with clear responsibilities:
 - `bun test` → unit + API tests only (fast, no server required)
-- `bun run test:e2e` → managed server + browser tests (calls `scripts/test-e2e.sh`)
+- `bun run test:e2e` → managed server + browser tests (calls `scripts/test_e2e.py`)
 - `bun run test:all` → runs both in sequence
 
 **Implementation**:
 1. Update `package.json` scripts
-2. Create `scripts/test-e2e.sh`:
-   ```bash
-   #!/bin/bash
-   set -e
+2. Create `scripts/test_e2e.py`:
+   ```python
+   #!/usr/bin/env python3
+   import subprocess
+   import time
+   import sys
+   
    # Start server in background
-   bun run src/index.ts &
-   SERVER_PID=$!
-   trap "kill $SERVER_PID" EXIT
+   server = subprocess.Popen(["bun", "run", "src/index.ts"])
    
-   # Wait for server ready
-   timeout 10 bash -c 'until curl -s http://localhost:3000/health > /dev/null; do sleep 0.5; done'
-   
-   # Run E2E tests
-   source /home/node/.openclaw/devbox-env/lib/playwright-env.sh
-   bun test --preload ./tests/e2e/setup.ts tests/e2e/
+   # Wait for server ready (poll health endpoint)
+   # Run E2E tests (sources playwright-env.sh internally)
+   # Kill server on exit
    ```
+   (Note: The script sources `/home/node/.openclaw/devbox-env/lib/playwright-env.sh` for Playwright runtime, but the repo-local executable is Python.)
 3. Update test file patterns to exclude `tests/e2e/` from default `bun test`
 
 ### Swamp Usage
@@ -154,14 +153,14 @@ $ bun test
   "sandbox": "agent",
   "steps": {
     "work": {
-      "pre": ["scripts/check-impact-map.sh"],
-      "post": ["scripts/check-design-boundaries.sh"]
+      "pre": ["python scripts/check_impact_map.py"],
+      "post": ["python scripts/check_design_boundaries.py"]
     },
     "review": {
-      "script": "scripts/behavioral-review.sh"
+      "script": "python scripts/behavioral_review.py"
     },
     "gate": {
-      "script": "scripts/check-completion.sh"
+      "script": "python scripts/check_completion.py"
     },
     "iterate": {},
     "ralph": {}
@@ -195,12 +194,12 @@ Create lightweight check scripts that validate expected sections exist in task f
 
 ### Review Flow
 1. Code review complete
-2. Cook `review` step calls `behavioral-review.sh`
+2. Cook `review` step calls `behavioral_review.py`
 3. Script starts server, runs E2E, captures artifacts
 4. Generates behavioral review report
 
 ### Gate Flow
-1. Cook `gate` step calls `check-completion.sh`
+1. Cook `gate` step calls `check_completion.py`
 2. Script verifies completion checklist items:
    - All `[x]` marked
    - Evidence links valid
@@ -221,11 +220,11 @@ Create lightweight check scripts that validate expected sections exist in task f
 ├── .cook/
 │   └── config.json (enhanced with step scripts)
 ├── scripts/
-│   ├── test-e2e.sh (new, managed server + browser)
-│   ├── behavioral-review.sh (new, EX-012)
-│   ├── check-impact-map.sh (new, validation helper)
-│   ├── check-design-boundaries.sh (new, validation helper)
-│   └── check-completion.sh (new, validation helper)
+│   ├── test_e2e.py (new, managed server + browser)
+│   ├── behavioral_review.py (new, EX-012)
+│   ├── check_impact_map.py (new, validation helper)
+│   ├── check_design_boundaries.py (new, validation helper)
+│   └── check_completion.py (new, validation helper)
 ├── docs/
 │   └── workflow/
 │       └── sdlc-experiments.md (documentation of five experiments)

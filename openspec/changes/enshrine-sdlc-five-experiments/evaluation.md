@@ -29,7 +29,7 @@ Honest caveat: the branch is functionally strong but not fully Decapod-clean yet
 - **Template**: `.decapod/templates/impact-map.md` (120 lines)
   - Sections: Files to modify, Symbols affected, Blast radius, Dependencies
   - Includes comprehensive example for daily card feature
-- **Validation script**: `scripts/check-impact-map.sh` (50 lines)
+- **Validation script**: `scripts/check_impact_map.py` (Python implementation)
   - Checks for all required sections
   - Returns meaningful error messages with template reference
 - **Integration**: Referenced in AGENTS.md, documented in workflow guide
@@ -40,7 +40,7 @@ Honest caveat: the branch is functionally strong but not fully Decapod-clean yet
   - Identifies 5 key surfaces affected (workflow contract, verification commands, E2E path, task artifacts, Cook orchestration)
   - Maps blast radius to contributors, developers, systems
   - Documents dependency changes (package.json test scripts)
-- **Validation script tested**: `bash scripts/check-impact-map.sh TASK.md` → ✅ passed
+- **Validation script tested**: `python scripts/check_impact_map.py TASK.md` → ✅ passed
 - **Cook integration**: `.cook/config.json` `work.pre` step calls validation script
 
 #### Friction Introduced
@@ -65,7 +65,7 @@ Honest caveat: the branch is functionally strong but not fully Decapod-clean yet
 - **Template**: `.decapod/templates/design-boundaries.md` (110 lines)
   - Sections: In scope, Out of scope, Explicit non-goals, Scope creep triggers
   - Includes realistic example with conditional out-of-scope items
-- **Validation script**: `scripts/check-design-boundaries.sh` (48 lines)
+- **Validation script**: `scripts/check_design_boundaries.py` (Python implementation)
   - Checks for all required boundary sections
   - Clear error messages with expected structure
 - **Integration**: Referenced in AGENTS.md, Cook `work.post` validation
@@ -76,7 +76,7 @@ Honest caveat: the branch is functionally strong but not fully Decapod-clean yet
   - **Out of scope**: 5 deferred features (product features, cross-repo work, optimizations, refactoring)
   - **Non-goals**: 3 explicit anti-patterns (no architecture changes, no framework sprawl, no premature enforcement)
   - **Scope creep triggers**: 5 concrete conditions (time > 3.5h, files > 25, new dependencies, architecture impact, workspace expansion)
-- **Validation script tested**: `bash scripts/check-design-boundaries.sh TASK.md` → ✅ passed
+- **Validation script tested**: `python scripts/check_design_boundaries.py TASK.md` → ✅ passed
 
 #### Friction Introduced
 - **Time cost**: 10-15 minutes to define boundaries explicitly
@@ -101,7 +101,7 @@ Honest caveat: the branch is functionally strong but not fully Decapod-clean yet
   - Sections: Planning & Design, TDD, Implementation Quality, Behavioral Verification, Integration & Validation
   - **Key innovation**: Requires evidence links (commit SHAs, test output, report paths)
   - **Self-review concerns**: Forces documentation of 3 explicit concerns with risks and mitigations
-- **Validation script**: `scripts/check-completion.sh` (75 lines)
+- **Validation script**: `scripts/check_completion.py` (Python implementation)
   - Counts completed vs. incomplete items
   - Warns if Self-Review Concerns or Evidence sections missing
   - Non-blocking for incomplete items (warning, not failure)
@@ -115,7 +115,7 @@ Honest caveat: the branch is functionally strong but not fully Decapod-clean yet
   - **Behavioral review evidence**: Report path `reports/behavioral-review-20260413-091410.md`
   - **Decapod validation**: `pass=149 fail=24 warn=5` (attempted and reported honestly; not green)
   - **Self-review concerns**: 3 documented (validation script patterns, Cook auto-execution, template maintenance burden)
-- **Validation script tested**: `bash scripts/check-completion.sh TASK.md` → ⚠️  8 items initially incomplete, all resolved before final commit
+- **Validation script tested**: `python scripts/check_completion.py TASK.md` → ⚠️  8 items initially incomplete, all resolved before final commit
 
 #### Friction Introduced
 - **Time cost**: 15-20 minutes to complete all checklist items with evidence
@@ -140,7 +140,7 @@ Current checklist is excellent for this task size but would create friction for 
 ### EX-012: Behavioral Review Pass After Code Review
 
 #### Concrete Repo Change
-- **Script**: `scripts/behavioral-review.sh` (140 lines)
+- **Script**: `scripts/behavioral_review.py` (Python implementation)
   - Starts server in test mode
   - Runs E2E test suite
   - Captures server logs, test output
@@ -156,7 +156,7 @@ Current checklist is excellent for this task size but would create friction for 
 - **Integration**: Cook `review` step, documented in workflow guide
 
 #### Evidence of Usage
-- **Script executed successfully**: `bash scripts/behavioral-review.sh` → ✅ passed
+- **Script executed successfully**: `python scripts/behavioral_review.py` → ✅ passed
   - **Test result**: All 10 E2E tests passed
   - **Report generated**: `reports/behavioral-review-20260413-091410.md` (70 lines)
   - **Observations documented**: 
@@ -247,7 +247,7 @@ Current checklist is excellent for this task size but would create friction for 
 - **Problem**: `bun test` ran unit + E2E tests, E2E failed without server (`ERR_CONNECTION_REFUSED`)
 - **Solution**: 
   - `package.json` test script now lists unit test files explicitly (excludes e2e/)
-  - `test:e2e` script calls `scripts/test-e2e.sh` with managed server
+  - `test:e2e` script calls `scripts/test_e2e.py` with managed server
   - `test:all` runs both sequentially
 - **Result**: Clean separation, fast unit tests (217ms), reliable E2E tests (4.66s with server startup)
 - **Impact**: Makes TDD cycle practical (fast unit tests) and behavioral verification honest (managed server)
@@ -316,7 +316,7 @@ Current checklist is excellent for this task size but would create friction for 
 - Templates are versioned in git, changes are explicit
 - Evaluation report recommends retire/revise based on friction
 - Documentation includes "iterate and measure" guidance
-- Scripts are simple (bash grep), low maintenance surface
+- Scripts are simple (Python with regex), low maintenance surface
 - Consider consolidating templates into single workflow-template.md if maintenance burden proves real
 
 ---

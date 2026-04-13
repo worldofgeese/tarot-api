@@ -104,11 +104,11 @@ For each experiment, include in the final report:
 - `.decapod/templates/resource-headroom.md` (new)
 
 **Scripts:**
-- `scripts/behavioral-review.sh` (new)
-- `scripts/check-impact-map.sh` (new)
-- `scripts/check-design-boundaries.sh` (new)
-- `scripts/check-completion.sh` (new)
-- `scripts/test-e2e.sh` (existing, verify works)
+- `scripts/behavioral_review.py` (new, Python, replaces shell version)
+- `scripts/check_impact_map.py` (new, Python, replaces shell version)
+- `scripts/check_design_boundaries.py` (new, Python, replaces shell version)
+- `scripts/check_completion.py` (new, Python, replaces shell version)
+- `scripts/test_e2e.py` (new, Python, replaces shell version)
 
 **Documentation:**
 - `AGENTS.md` - add five experiments section
@@ -118,7 +118,7 @@ For each experiment, include in the final report:
 ### Symbols / Surfaces Likely Affected
 
 - **Repo workflow contract**: AGENTS.md SDLC pipeline section updated with experiment references
-- **Verification commands**: New validation scripts for Impact Map, Design Boundaries, Completion
+- **Verification commands**: New Python validation scripts for Impact Map, Design Boundaries, Completion
 - **E2E execution path**: `bun test` now excludes E2E, `bun run test:e2e` runs managed server
 - **Task artifact expectations**: Task briefs now expected to include all five experiment sections
 - **Cook orchestration**: Cook steps now call validation scripts
@@ -144,7 +144,7 @@ For each experiment, include in the final report:
 
 **Usage changed:**
 - `bun test` - now explicitly lists unit test files, excludes e2e/ subdirectory
-- E2E tests - now run through `scripts/test-e2e.sh` with managed server
+- E2E tests - now run through `scripts/test_e2e.py` with managed server
 
 No new dependencies added.
 
@@ -155,8 +155,8 @@ No new dependencies added.
 1. **Primary deliverable**: Enshrine five SDLC experiments in tarot-api through concrete repo artifacts
 2. **Secondary deliverables**:
    - Create four workflow templates (.decapod/templates/)
-   - Create three validation scripts (scripts/check-*.sh)
-   - Create behavioral review script (scripts/behavioral-review.sh)
+   - Create three validation scripts (scripts/check-*.py, Python implementations)
+   - Create behavioral review script (scripts/behavioral_review.py, Python)
    - Fix E2E test path (separate unit from E2E, managed server)
    - Enhance Cook configuration with step orchestration
    - Update AGENTS.md with experiments section
@@ -306,7 +306,7 @@ No new dependencies added.
 
 - **OpenSpec change location**: `openspec/changes/enshrine-sdlc-five-experiments/`
 - **Templates created**: `.decapod/templates/*.md` (4 files)
-- **Scripts created**: `scripts/behavioral-review.sh`, `scripts/check-*.sh` (4 files)
+- **Scripts created**: `scripts/behavioral_review.py`, `scripts/check_*.py` (4 Python validation scripts)
 - **Test output**: (to be filled after verification)
 - **Behavioral review report**: `reports/behavioral-review-20260413-091410.md`
 - **Decapod validation**: attempted from worktree; current result `pass=149 fail=24 warn=5`

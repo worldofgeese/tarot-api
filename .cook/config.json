@@ -3,14 +3,14 @@
   "sandbox": "agent",
   "steps": {
     "work": {
-      "pre": ["bash scripts/check-impact-map.sh TASK.md || echo '⚠️  Impact Map check failed - template missing'"],
-      "post": ["bash scripts/check-design-boundaries.sh TASK.md || echo '⚠️  Design Boundaries check failed - template missing'"]
+      "pre": ["python scripts/check_impact_map.py TASK.md || echo '⚠️  Impact Map check failed - template missing'"],
+      "post": ["python scripts/check_design_boundaries.py TASK.md || echo '⚠️  Design Boundaries check failed - template missing'"]
     },
     "review": {
-      "script": "bash scripts/behavioral-review.sh"
+      "script": "python scripts/behavioral_review.py"
     },
     "gate": {
-      "script": "bash scripts/check-completion.sh TASK.md"
+      "script": "python scripts/check_completion.py TASK.md"
     },
     "iterate": {
       "description": "Re-run failed checks and fix issues"
