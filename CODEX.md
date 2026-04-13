@@ -7,4 +7,12 @@ For repo contracts and governance context, use:
 - `decapod docs show core/INTERFACES.md`
 - `decapod docs show docs/workflow/sdlc-experiments.md` when working on the five SDLC experiments
 
-Work only in `.decapod/workspaces/*`, access `.decapod` files only through the CLI, claim work before acting when the todo surface is in use, and do not claim completion without running `decapod validate`.
+Mandatory governed execution rules:
+- .decapod files are accessed only via decapod CLI.
+- Use Docker git workspaces under `.decapod/workspaces/*` for governed work.
+- request elevated permissions before Docker/container workspace commands.
+- Use `DECAPOD_SESSION_PASSWORD` when the session auth gate applies.
+- Create/claim work before acting with `decapod todo add "<task>"` and `decapod todo claim --id <task-id>`.
+- Run `decapod docs ingest` for core constitution ingestion when the control plane requires it.
+- Do not claim completion without `decapod validate`.
+- `cargo install decapod` is the version update step when the binary must be refreshed.
