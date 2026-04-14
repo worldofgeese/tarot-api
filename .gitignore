@@ -38,3 +38,9 @@ node_modules/
 !.claude/skills/
 !.claude/skills/**
 !.claude/settings.local.json
+
+# Generated runtime artifacts
+tarot.db
+status/
+reports/
+scripts/__pycache__/
