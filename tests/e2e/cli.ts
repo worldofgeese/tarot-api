@@ -2,86 +2,80 @@
  * cli.ts — playwright-cli wrapper for bun:test E2E tests
  *
  * playwright-cli is the ONLY browser automation interface in this workspace.
- * No `import { chromium } from "playwright"`, no chromium.launch(), no page objects.
- * All browser interaction goes through `devbox run playwright-cli <cmd>`.
+ * No chromium.launch(), no page objects, no Playwright Node.js API.
  *
- * playwright-cli reads .playwright/cli.config.json automatically, which sets:
- *   - executablePath: Nix Chromium binary
- *   - --no-sandbox, --disable-dev-shm-usage, --disable-gpu
- *
- * Usage in tests:
- *   import { cli, openSession, closeSession } from "./cli";
- *   const session = openSession();
- *   cli(session, "goto", "http://localhost:3000");
- *   const snap = cli(session, "snapshot");
- *   cli(session, "screenshot");
- *   closeSession(session);
+ * Each test runs a sequence of playwright-cli commands as a single shell script
+ * (open → goto → snapshot → close) to ensure session state persists between calls.
  */
 
 import { spawnSync } from "bun";
 import { randomBytes } from "crypto";
+import { writeFileSync, unlinkSync } from "fs";
+import { tmpdir } from "os";
+import { join } from "path";
 
-const DEVBOX = "/home/node/.openclaw/devbox-env";
-const PW_CLI = "playwright-cli";
+const NODE = "/nix/store/yqkhp0j27pk15yd2wmqjkjbglwaa5z1l-nodejs-slim-22.22.1/bin/node";
+const PW_CLI_JS = "/home/node/.openclaw/npm-global/lib/node_modules/@playwright/cli/playwright-cli.js";
+const PW_CONFIG = "/home/node/.openclaw/devbox-env/.playwright/cli.config.json";
+const PW_CMD = `${NODE} ${PW_CLI_JS} --config=${PW_CONFIG}`;
 
-export type Session = { id: string };
+export type SessionResult = { snapshot: string; title: string; url: string };
 
-/** Open a new isolated playwright-cli browser session */
-export function openSession(): Session {
-  const id = `test-${randomBytes(4).toString("hex")}`;
-  return { id };
-}
+/**
+ * Run a complete playwright-cli session as a single shell script.
+ * Commands run sequentially in one process group — session state persists.
+ */
+export function runSession(url: string, extraCommands: string[] = []): SessionResult {
+  const sessionId = `t-${randomBytes(3).toString("hex")}`;
+  const scriptPath = join(tmpdir(), `pw-session-${sessionId}.sh`);
+  const snapshotFile = join(tmpdir(), `pw-snapshot-${sessionId}.txt`);
 
-/** Run a playwright-cli command in a named session. Returns stdout as string. */
-export function cli(session: Session, ...args: string[]): string {
+  const commands = [
+    `${PW_CMD} -s=${sessionId} open`,
+    `${PW_CMD} -s=${sessionId} goto ${url}`,
+    ...extraCommands.map(cmd => `${PW_CMD} -s=${sessionId} ${cmd}`),
+    `${PW_CMD} -s=${sessionId} snapshot > ${snapshotFile} 2>&1`,
+    `${PW_CMD} -s=${sessionId} close`,
+  ].join("\n");
+
+  writeFileSync(scriptPath, `#!/bin/bash\nset -e\n${commands}\n`, { mode: 0o755 });
+
   const result = spawnSync({
-    cmd: ["devbox", "run", "--", PW_CLI, `-s=${session.id}`, ...args],
-    cwd: DEVBOX,
+    cmd: ["/bin/bash", scriptPath],
     stdout: "pipe",
     stderr: "pipe",
-    env: { ...process.env },
+    timeout: 30000,
   });
 
-  const out = result.stdout?.toString() ?? "";
-  const err = result.stderr?.toString() ?? "";
-
-  if (!result.success && result.exitCode !== 0) {
-    // Surface stderr on failure for test diagnosis
-    throw new Error(`playwright-cli ${args.join(" ")} failed (exit ${result.exitCode}):\n${err || out}`);
-  }
-
-  return out;
-}
-
-/** Close the browser session */
-export function closeSession(session: Session): void {
+  let snapshot = "";
   try {
-    spawnSync({
-      cmd: ["devbox", "run", "--", PW_CLI, `-s=${session.id}`, "close"],
-      cwd: DEVBOX,
-      stdout: "pipe",
-      stderr: "pipe",
-    });
-  } catch {
-    // Best-effort close — don't fail tests on cleanup errors
-  }
+    snapshot = require("fs").readFileSync(snapshotFile, "utf-8");
+    unlinkSync(snapshotFile);
+  } catch { /* no snapshot file */ }
+  try { unlinkSync(scriptPath); } catch { /* cleanup */ }
+
+  const allOutput = (result.stdout?.toString() ?? "") + snapshot;
+
+  // Extract title and URL from playwright-cli output
+  const titleMatch = allOutput.match(/Page Title: (.+)/);
+  const urlMatch = allOutput.match(/Page URL: (.+)/);
+
+  return {
+    snapshot: allOutput,
+    title: titleMatch?.[1]?.trim() ?? "",
+    url: urlMatch?.[1]?.trim() ?? "",
+  };
 }
 
-/** Navigate and wait for page to settle. Returns snapshot output. */
-export function gotoAndSnapshot(session: Session, url: string): string {
-  cli(session, "goto", url);
-  return cli(session, "snapshot");
+/**
+ * Run a session with a click action before snapshot.
+ * Delegates to runSession with an extra click command.
+ */
+export function runSessionWithClick(url: string, locator: string): SessionResult {
+  return runSession(url, [`click "${locator}"`]);
 }
 
-/** Count occurrences of a CSS class in snapshot output (rough but effective) */
-export function countInSnapshot(snapshot: string, cssClass: string): number {
-  const regex = new RegExp(cssClass, "g");
-  return (snapshot.match(regex) ?? []).length;
-}
-
-/** Assert snapshot contains text */
-export function assertContains(snapshot: string, text: string): void {
-  if (!snapshot.includes(text)) {
-    throw new Error(`Expected snapshot to contain "${text}" but it didn't.\nSnapshot:\n${snapshot.slice(0, 500)}`);
-  }
+/** Count occurrences of a string in output */
+export function countInSnapshot(snapshot: string, pattern: string): number {
+  return (snapshot.match(new RegExp(pattern, "g")) ?? []).length;
 }

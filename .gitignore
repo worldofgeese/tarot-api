@@ -45,3 +45,4 @@ status/
 reports/
 scripts/__pycache__/
 .soulforge
+.playwright-cli/
