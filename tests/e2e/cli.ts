@@ -69,45 +69,10 @@ export function runSession(url: string, extraCommands: string[] = []): SessionRe
 
 /**
  * Run a session with a click action before snapshot.
+ * Delegates to runSession with an extra click command.
  */
 export function runSessionWithClick(url: string, locator: string): SessionResult {
-  const sessionId = `t-${randomBytes(3).toString("hex")}`;
-  const scriptPath = join(tmpdir(), `pw-session-${sessionId}.sh`);
-  const snapshotFile = join(tmpdir(), `pw-snapshot-${sessionId}.txt`);
-
-  const commands = [
-    `${PW_CMD} -s=${sessionId} open`,
-    `${PW_CMD} -s=${sessionId} goto ${url}`,
-    `${PW_CMD} -s=${sessionId} click "${locator}"`,
-    `${PW_CMD} -s=${sessionId} snapshot > ${snapshotFile} 2>&1`,
-    `${PW_CMD} -s=${sessionId} close`,
-  ].join("\n");
-
-  writeFileSync(scriptPath, `#!/bin/bash\nset -e\n${commands}\n`, { mode: 0o755 });
-
-  const result = spawnSync({
-    cmd: ["/bin/bash", scriptPath],
-    stdout: "pipe",
-    stderr: "pipe",
-    timeout: 45000,
-  });
-
-  let snapshot = "";
-  try {
-    snapshot = require("fs").readFileSync(snapshotFile, "utf-8");
-    unlinkSync(snapshotFile);
-  } catch { /* no snapshot */ }
-  try { unlinkSync(scriptPath); } catch { /* cleanup */ }
-
-  const allOutput = (result.stdout?.toString() ?? "") + snapshot;
-  const titleMatch = allOutput.match(/Page Title: (.+)/);
-  const urlMatch = allOutput.match(/Page URL: (.+)/);
-
-  return {
-    snapshot: allOutput,
-    title: titleMatch?.[1]?.trim() ?? "",
-    url: urlMatch?.[1]?.trim() ?? "",
-  };
+  return runSession(url, [`click "${locator}"`]);
 }
 
 /** Count occurrences of a string in output */

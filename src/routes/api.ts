@@ -133,6 +133,13 @@ export function apiRoutes(db: Database) {
       }));
     })
 
+    .get("/cards/keywords", () => {
+      const rows = db.query("SELECT keywords FROM cards").all() as { keywords: string }[];
+      const all = rows.flatMap(r => (r.keywords ?? "").split(",").map((k: string) => k.trim()).filter(Boolean));
+      const keywords = [...new Set(all)].sort();
+      return { keywords };
+    })
+
     .get("/cards/:id", ({ params: { id }, set }) => {
       // MOSAIC: Validate card ID before processing
       const validation = validateCardId(id);
@@ -332,13 +339,6 @@ export function apiRoutes(db: Database) {
         ...card,
         keywords: parseKeywords(card.keywords)
       }));
-    })
-
-    .get("/cards/keywords", () => {
-      const rows = db.query("SELECT keywords FROM cards").all() as { keywords: string }[];
-      const all = rows.flatMap(r => r.keywords.split(",").map(k => k.trim()).filter(Boolean));
-      const keywords = [...new Set(all)].sort();
-      return { keywords };
     })
 
     .get("/cards/suit/:suit", ({ params: { suit }, set }) => {
