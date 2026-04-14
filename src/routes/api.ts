@@ -334,6 +334,13 @@ export function apiRoutes(db: Database) {
       }));
     })
 
+    .get("/cards/keywords", () => {
+      const rows = db.query("SELECT keywords FROM cards").all() as { keywords: string }[];
+      const all = rows.flatMap(r => r.keywords.split(",").map(k => k.trim()).filter(Boolean));
+      const keywords = [...new Set(all)].sort();
+      return { keywords };
+    })
+
     .get("/cards/suit/:suit", ({ params: { suit }, set }) => {
       const query = db.query(`
         SELECT * FROM cards
