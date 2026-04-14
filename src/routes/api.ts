@@ -399,7 +399,7 @@ export function apiRoutes(db: Database) {
         return { error: validation.error };
       }
 
-      const numericId = parseInt(id);
+      const numericId = parseInt(id, 10);
       const query = db.query("SELECT id, name, upright_meaning, reversed_meaning FROM cards WHERE id = ?");
       const card = query.get(numericId) as { id: number; name: string; upright_meaning: string; reversed_meaning: string } | null;
 
