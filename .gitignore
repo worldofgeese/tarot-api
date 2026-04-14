@@ -44,3 +44,4 @@ tarot.db
 status/
 reports/
 scripts/__pycache__/
+.soulforge
