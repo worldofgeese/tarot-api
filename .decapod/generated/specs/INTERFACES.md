@@ -1,60 +1,49 @@
 # Interfaces
 
 ## Contract Principles
-- Prefer explicit schemas over implicit behavior.
-- Every mutating interface defines idempotency semantics.
-- Every failure path maps to a typed, documented error code.
+- All endpoints return JSON (Content-Type: application/json)
+- Errors return `{error: string}` with appropriate HTTP status code
+- No authentication required on any endpoint
+- All responses are idempotent (GET-only endpoints)
 
-## API / RPC Contracts
-| Interface | Method | Request Schema | Response Schema | Errors | Idempotency |
-|---|---|---|---|---|---|
-| `TODO` | `TODO` | `TODO` | `TODO` | `TODO` | `TODO` |
+## API Contracts
 
-## Event Consumers
-| Consumer | Event | Ordering Requirement | Retry Policy | DLQ Policy |
-|---|---|---|---|---|
-| `TODO` | `TODO` | `TODO` | `TODO` | `TODO` |
+| Endpoint | Response Schema | Error Codes |
+|---|---|---|
+| GET /api/health | `{status: "ok", card_count: number}` | 500 on DB failure |
+| GET /api/version | `{api_name: string, version: string, card_count: number}` | 500 on DB failure |
+| GET /api/stats | `{totalCards, majorArcana, minorArcana, suits}` | 500 on DB failure |
+| GET /api/cards | `Card[]` (all 78) | 500 on DB failure |
+| GET /api/cards/:id | `Card` | 400 invalid id, 404 not found |
+| GET /api/cards/random | `Card[]` (count param) | 400 invalid count |
+| GET /api/cards/search | `Card[]` filtered | 400 missing query |
+| GET /api/daily | `Card` + `reversed: boolean` | 400 invalid date |
+| GET /api/meaning/:id | `{id, name, upright, reversed}` | 400/404 |
+| GET /api/spreads | `Spread[]` | 500 on DB failure |
+| GET /api/spread/:name | `{spread, cards[]}` | 404 unknown spread |
 
-## Outbound Dependencies
-| Dependency | Purpose | SLA | Timeout | Circuit-Breaker |
-|---|---|---|---|---|
-| `TODO` | `TODO` | `TODO` | `TODO` | `TODO` |
-
-## Inbound Contracts
-- API / RPC entrypoints:
-- CLI surfaces:
-- Event/webhook consumers:
-- Repository-detected surfaces: npm
-
-## Data Ownership
-- Source-of-truth tables/collections:
-- Cross-boundary read models:
-- Consistency expectations:
-
-## Error Taxonomy Example (service_or_library)
-```ts
-export enum ApiErrorCode {
-  Validation = "validation_failed",
-  UpstreamTimeout = "upstream_timeout",
-  Conflict = "conflict"
+## Card Schema
+```typescript
+interface Card {
+  id: number;           // 0-77
+  name: string;
+  arcana: string;       // "major" | "minor"
+  suit: string | null;  // null for Major Arcana
+  number: number | null;
+  keywords: string[];   // parsed from comma-separated DB field
+  upright_meaning: string;
+  reversed_meaning: string;
+  element: string | null;
+  planet: string | null;
+  zodiac: string | null;
 }
 ```
 
-## Failure Semantics
-| Failure Class | Retry/Backoff | Client Contract | Observability |
-|---|---|---|---|
-| Validation | No retry | 4xx typed error | warn log + metric |
-| Dependency timeout | Exponential backoff | 503 with retryable code | error log + alert |
-| Conflict | Conditional retry | 409 with conflict detail | info log + metric |
+## Outbound Dependencies
+None — this is a fully local, offline-capable API with no external service calls at runtime.
 
-## Timeout Budget
-| Hop | Budget (ms) | Notes |
-|---|---|---|
-| Client -> Edge/API | 500 | Includes auth + routing |
-| API -> Domain | 300 | Includes validation |
-| Domain -> Store/Dependency | 200 | Includes retry overhead |
-
-## Interface Versioning
-- Version strategy (`v1`, date-based, semver):
-- Backward-compatibility guarantees:
-- Deprecation window and removal policy:
+## Error Policy
+- 400: Client error (invalid parameter format/value)
+- 404: Resource not found
+- 500: Internal error (DB failure, unexpected exception)
+- All errors: `{error: "<human-readable message>"}`
