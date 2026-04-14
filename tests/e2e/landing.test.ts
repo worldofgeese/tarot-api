@@ -49,4 +49,4 @@ test("card tiles are clickable", async () => {
   await page.waitForURL(/\/card\/\d+/, { timeout: 30000 });
 
   await browser.close();
-}, 45000); // Extended timeout for Playwright navigation
+}, 45000); // Playwright navigation — bun global timeout handles this
