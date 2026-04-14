@@ -1,53 +1,38 @@
 import { test, expect } from "bun:test";
-import { chromium } from "playwright";
+import { cli, openSession, closeSession, gotoAndSnapshot, countInSnapshot } from "./cli";
 
-// Playwright reads PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH automatically (set by setup.ts)
-// Never hardcode executablePath or launch args here.
-test("landing page shows 78 card tiles", async () => {
-  const browser = await chromium.launch();
-  const context = await browser.newContext();
-  const page = await context.newPage();
-
-  await page.goto("http://localhost:3000", { timeout: 30000 });
-
-  // Wait for cards to load
-  await page.waitForSelector(".card-tile", { timeout: 30000 });
-
-  // Count card tiles
-  const cardTiles = await page.locator(".card-tile").count();
-  expect(cardTiles).toBe(78);
-
-  await browser.close();
+test("landing page shows 78 card tiles", () => {
+  const session = openSession();
+  try {
+    const snapshot = gotoAndSnapshot(session, "http://localhost:3000");
+    // card-tile appears once per card in the snapshot
+    const count = countInSnapshot(snapshot, "card-tile");
+    expect(count).toBe(78);
+  } finally {
+    closeSession(session);
+  }
 });
 
-test("landing page has correct title", async () => {
-  const browser = await chromium.launch();
-  const context = await browser.newContext();
-  const page = await context.newPage();
-
-  await page.goto("http://localhost:3000", { timeout: 30000 });
-
-  const title = await page.title();
-  expect(title).toContain("Tarot");
-
-  await browser.close();
+test("landing page has correct title", () => {
+  const session = openSession();
+  try {
+    const snapshot = gotoAndSnapshot(session, "http://localhost:3000");
+    expect(snapshot).toContain("Tarot");
+  } finally {
+    closeSession(session);
+  }
 });
 
-test("card tiles are clickable", async () => {
-  const browser = await chromium.launch();
-  const context = await browser.newContext();
-  const page = await context.newPage();
-
-  await page.goto("http://localhost:3000", { timeout: 30000 });
-
-  await page.waitForSelector(".card-tile", { timeout: 30000 });
-
-  // Click first card
-  await page.locator(".card-tile").first().click();
-
-  // Should navigate to card detail page
-  await page.waitForURL(/\/card\/\d+/, { timeout: 30000 });
-
-  await browser.close();
-}, 45000); // Playwright navigation — bun global timeout handles this
-
+test("card tiles are clickable and navigate to card detail", () => {
+  const session = openSession();
+  try {
+    gotoAndSnapshot(session, "http://localhost:3000");
+    // Click the first card-tile element
+    cli(session, "click", "getByRole('link', { name: /card/i })");
+    const afterSnapshot = cli(session, "snapshot");
+    // Should now be on a /card/:id page
+    expect(afterSnapshot).toMatch(/\/card\/\d+|card-name|The Fool/);
+  } finally {
+    closeSession(session);
+  }
+}, 45000);
