@@ -1,5 +1,25 @@
 # COOK.md — Tarot API Agent Instructions
 
+## Tools Available in This Repo
+
+```
+openspec: /home/node/.openclaw/npm-global/bin/openspec
+decapod:  /home/node/.openclaw/bin/decapod
+fj-ex:    /home/node/.openclaw/bin/fj-ex
+bun:      /home/node/.openclaw/devbox-env/.devbox/nix/profile/default/bin/bun
+swamp:    ~/.local/bin/swamp
+```
+
+Always use absolute paths for these tools — they may not be in PATH.
+
+**OpenSpec flow (mandatory for any feature/API change):**
+1. `/home/node/.openclaw/npm-global/bin/openspec new change "<name>"`
+2. `/home/node/.openclaw/npm-global/bin/openspec instructions <artifact> --change <name> --json`
+3. Generate each artifact (proposal.md, design.md, tasks.md) following the instructions
+4. `/home/node/.openclaw/npm-global/bin/openspec status --change <name>` — confirm ready
+
+Read `.claude/skills/openspec-propose/SKILL.md` for the full flow.
+
 ## Loop Context
 
 Step: **${step}** | Iteration: ${iteration}/${maxIterations}
