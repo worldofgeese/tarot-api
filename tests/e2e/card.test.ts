@@ -1,10 +1,8 @@
-const PW_EXEC = process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH || "/home/node/.openclaw/devbox-env/.devbox/nix/profile/default/bin/chromium";
-
 import { test, expect } from "bun:test";
 import { chromium } from "playwright";
-
+import { launchOptions } from "./playwright-config";
 test("card detail page renders all fields", async () => {
-  const browser = await chromium.launch({ executablePath: PW_EXEC, args: ["--disable-crash-reporter", "--no-sandbox", "--disable-dev-shm-usage"] });
+  const browser = await chromium.launch(launchOptions);
   const context = await browser.newContext();
   const page = await context.newPage();
 
@@ -30,7 +28,7 @@ test("card detail page renders all fields", async () => {
 });
 
 test("card detail page shows The Fool for id 0", async () => {
-  const browser = await chromium.launch({ executablePath: PW_EXEC, args: ["--disable-crash-reporter", "--no-sandbox", "--disable-dev-shm-usage"] });
+  const browser = await chromium.launch(launchOptions);
   const context = await browser.newContext();
   const page = await context.newPage();
 
@@ -43,7 +41,7 @@ test("card detail page shows The Fool for id 0", async () => {
 });
 
 test("invalid card id shows 404", async () => {
-  const browser = await chromium.launch({ executablePath: PW_EXEC, args: ["--disable-crash-reporter", "--no-sandbox", "--disable-dev-shm-usage"] });
+  const browser = await chromium.launch(launchOptions);
   const context = await browser.newContext();
   const page = await context.newPage();
 
@@ -52,3 +50,4 @@ test("invalid card id shows 404", async () => {
 
   await browser.close();
 });
+

@@ -1,10 +1,8 @@
-const PW_EXEC = process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH || "/home/node/.openclaw/devbox-env/.devbox/nix/profile/default/bin/chromium";
-
 import { test, expect } from "bun:test";
 import { chromium } from "playwright";
-
+import { launchOptions } from "./playwright-config";
 test("landing page shows 78 card tiles", async () => {
-  const browser = await chromium.launch({ executablePath: PW_EXEC, args: ["--disable-crash-reporter", "--no-sandbox", "--disable-dev-shm-usage"] });
+  const browser = await chromium.launch(launchOptions);
   const context = await browser.newContext();
   const page = await context.newPage();
 
@@ -21,7 +19,7 @@ test("landing page shows 78 card tiles", async () => {
 });
 
 test("landing page has correct title", async () => {
-  const browser = await chromium.launch({ executablePath: PW_EXEC, args: ["--disable-crash-reporter", "--no-sandbox", "--disable-dev-shm-usage"] });
+  const browser = await chromium.launch(launchOptions);
   const context = await browser.newContext();
   const page = await context.newPage();
 
@@ -34,7 +32,7 @@ test("landing page has correct title", async () => {
 });
 
 test("card tiles are clickable", async () => {
-  const browser = await chromium.launch({ executablePath: PW_EXEC, args: ["--disable-crash-reporter", "--no-sandbox", "--disable-dev-shm-usage"] });
+  const browser = await chromium.launch(launchOptions);
   const context = await browser.newContext();
   const page = await context.newPage();
 
@@ -50,3 +48,4 @@ test("card tiles are clickable", async () => {
 
   await browser.close();
 }, 45000); // Playwright navigation — bun global timeout handles this
+
