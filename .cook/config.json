@@ -3,24 +3,32 @@
   "sandbox": "agent",
   "steps": {
     "work": {
+      "agent": "claude",
+      "model": "sonnet",
       "pre": [
-        "python scripts/check_impact_map.py TASK.md || echo '⚠️  Impact Map check failed - template missing'",
-        "python scripts/check_tdd_evidence.py TASK.md || echo '⚠️  TDD evidence check failed - see scripts/check_tdd_evidence.py'"
+        "python3 scripts/check_impact_map.py TASK.md || echo '⚠️  Impact Map check failed - template missing'",
+        "python3 scripts/check_tdd_evidence.py TASK.md || echo '⚠️  TDD evidence check failed - see scripts/check_tdd_evidence.py'"
       ],
-      "post": ["python scripts/check_design_boundaries.py TASK.md || echo '⚠️  Design Boundaries check failed - template missing'"]
+      "post": [
+        "python3 scripts/check_design_boundaries.py TASK.md || echo '⚠️  Design Boundaries check failed - template missing'"
+      ]
     },
     "review": {
-      "script": "python scripts/behavioral_review.py"
+      "agent": "claude",
+      "model": "opus",
+      "script": "python3 scripts/behavioral_review.py"
     },
     "gate": {
-      "script": "python scripts/check_completion.py TASK.md && python scripts/check_decapod_validation.py"
+      "script": "python3 scripts/check_completion.py TASK.md && python3 scripts/check_decapod_validation.py"
     },
     "iterate": {
       "description": "Re-run failed checks and fix issues"
-    },
-    "ralph": {
-      "description": "Final validation before merge"
     }
   },
-  "env": []
+  "env": [],
+  "retry": {
+    "enabled": true,
+    "pollIntervalMinutes": 2,
+    "maxWaitMinutes": 30
+  }
 }

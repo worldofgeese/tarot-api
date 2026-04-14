@@ -1,0 +1,16 @@
+type: command/shell
+typeVersion: 2026.02.09.1
+id: 3ca8a027-b046-4ad0-a340-0f4b538b030c
+name: forgejo-ci-status
+version: 1
+tags:
+  ci: forgejo
+  purpose: monitor
+globalArguments: {}
+methods:
+  execute:
+    arguments:
+      run: >-
+        curl -s "https://paphos.hound-celsius.ts.net/api/v1/repos/kypris/tarot-api/actions/runs?limit=1"
+        | python3 -c "import json,sys; d=json.load(sys.stdin); r=d['workflow_runs'][0]; print(f'Run {r[\"id\"]}: {r[\"status\"]} - {r[\"title\"]}')"
+      ignoreExitCode: true

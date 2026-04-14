@@ -1,0 +1,26 @@
+id: f9e744e7-b374-4d60-8545-631e65a257dc
+name: ci-health-check
+tags:
+  ci: forgejo
+  purpose: health-check
+jobs:
+  - name: check-ci
+    description: Check latest Forgejo CI run status for tarot-api
+    steps:
+      - name: latest-run
+        description: Query Forgejo Actions API for latest run status
+        task:
+          type: model_method
+          modelIdOrName: forgejo-ci-status
+          methodName: execute
+          inputs:
+            run: >-
+              curl -s "https://paphos.hound-celsius.ts.net/api/v1/repos/kypris/tarot-api/actions/runs?limit=1"
+              | python3 -c "import json,sys; d=json.load(sys.stdin); r=d['workflow_runs'][0]; print(f'Run {r[\"id\"]}: {r[\"status\"]} - {r[\"title\"]}')"
+            ignoreExitCode: true
+        dependsOn: []
+        weight: 0
+        allowFailure: false
+    dependsOn: []
+    weight: 0
+version: 3
