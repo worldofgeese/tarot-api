@@ -47,3 +47,15 @@ None — this is a fully local, offline-capable API with no external service cal
 - 404: Resource not found
 - 500: Internal error (DB failure, unexpected exception)
 - All errors: `{error: "<human-readable message>"}`
+
+## Inbound Contracts
+All inbound traffic is HTTP/1.1 GET requests from browsers or API clients. No authentication headers are required or enforced.
+
+## Data Ownership
+The SQLite database (`tarot.db`) is the sole owner of all card and spread data. No other system writes to it. The API is read-only.
+
+## Failure Semantics
+- Network failures: callers should retry with exponential backoff (no idempotency concerns — all reads)
+- Database errors: propagated as HTTP 500 with `{error: "..."}` body
+- Invalid parameters: HTTP 400 with descriptive error message
+- Not found: HTTP 404 with `{error: "..."}` body
