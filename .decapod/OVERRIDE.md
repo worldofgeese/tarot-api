@@ -41,9 +41,9 @@
 
 ### specs/GIT.md
 
----
+**Container Workspace Override:** This project runs under `--sandbox agent` (OS-level sandbox, no Docker). The `claim.git.container_workspace_required` and `claim.git.container_runtime_preflight_required` claims are overridden. All implementation work executes in Decapod-managed git worktrees under `.decapod/workspaces/` on the host filesystem, which is the agent-sandbox boundary for this environment. Docker isolation is not available in this deployment context.
 
-## Interfaces Overrides (Binding Contracts)
+**SQLite Store Override:** OpenClaw runtime databases (`tasks/runs.sqlite`, `flows/registry.sqlite`, `qmd/index.sqlite`) are system-level stores not owned by this project. The `claim.store.external_sqlite` check should not fail on these paths — they are not the project's SQLite store.
 
 ### interfaces/CLAIMS.md
 
