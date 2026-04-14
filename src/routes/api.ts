@@ -392,6 +392,30 @@ export function apiRoutes(db: Database) {
       return spread;
     })
 
+    .get("/meaning/:id", ({ params: { id }, set }) => {
+      const validation = validateCardId(id);
+      if (!validation.valid) {
+        set.status = 400;
+        return { error: validation.error };
+      }
+
+      const numericId = parseInt(id);
+      const query = db.query("SELECT id, name, upright_meaning, reversed_meaning FROM cards WHERE id = ?");
+      const card = query.get(numericId) as { id: number; name: string; upright_meaning: string; reversed_meaning: string } | null;
+
+      if (!card) {
+        set.status = 404;
+        return { error: "Card not found" };
+      }
+
+      return {
+        id: card.id,
+        name: card.name,
+        upright: card.upright_meaning,
+        reversed: card.reversed_meaning
+      };
+    })
+
     .post("/spreads/:id/draw", ({ params: { id }, set }) => {
       const spread = getSpread(id);
 
