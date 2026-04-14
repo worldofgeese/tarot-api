@@ -443,5 +443,15 @@ export function apiRoutes(db: Database) {
         spread,
         cards: drawnCards
       };
+    })
+
+    .get("/version", () => {
+      const cardCountQuery = db.query("SELECT COUNT(*) as count FROM cards");
+      const cardCountResult = cardCountQuery.get() as { count: number };
+      return {
+        api_name: "Tarot API",
+        version: "1.0.0",
+        card_count: cardCountResult.count,
+      };
     });
 }
