@@ -4,7 +4,7 @@ import { test, expect } from "bun:test";
 import { chromium } from "playwright";
 
 test("spread page draws 3 cards on button click", async () => {
-  const browser = await chromium.launch({ executablePath: PW_EXEC });
+  const browser = await chromium.launch({ executablePath: PW_EXEC, args: ["--disable-crash-reporter", "--no-sandbox", "--disable-dev-shm-usage"] });
   const context = await browser.newContext();
   const page = await context.newPage();
 
@@ -24,7 +24,7 @@ test("spread page draws 3 cards on button click", async () => {
 });
 
 test("spread page draws 10 cards for celtic cross", async () => {
-  const browser = await chromium.launch({ executablePath: PW_EXEC });
+  const browser = await chromium.launch({ executablePath: PW_EXEC, args: ["--disable-crash-reporter", "--no-sandbox", "--disable-dev-shm-usage"] });
   const context = await browser.newContext();
   const page = await context.newPage();
 
@@ -44,7 +44,7 @@ test("spread page draws 10 cards for celtic cross", async () => {
 });
 
 test("spread page draws 1 card for single card", async () => {
-  const browser = await chromium.launch({ executablePath: PW_EXEC });
+  const browser = await chromium.launch({ executablePath: PW_EXEC, args: ["--disable-crash-reporter", "--no-sandbox", "--disable-dev-shm-usage"] });
   const context = await browser.newContext();
   const page = await context.newPage();
 
@@ -64,7 +64,7 @@ test("spread page draws 1 card for single card", async () => {
 });
 
 test("drawn cards show card names", async () => {
-  const browser = await chromium.launch({ executablePath: PW_EXEC });
+  const browser = await chromium.launch({ executablePath: PW_EXEC, args: ["--disable-crash-reporter", "--no-sandbox", "--disable-dev-shm-usage"] });
   const context = await browser.newContext();
   const page = await context.newPage();
 
