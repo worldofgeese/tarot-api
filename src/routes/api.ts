@@ -140,6 +140,53 @@ export function apiRoutes(db: Database) {
       return { keywords };
     })
 
+    .get("/cards/keywords/search", ({ query, set }) => {
+      const { q } = query;
+
+      // Validate query parameter is present
+      const validation = validateStringParam(q as string, "q", true, false);
+      if (!validation.valid) {
+        set.status = 400;
+        return { error: validation.error };
+      }
+
+      const searchTerm = validation.sanitized?.toLowerCase();
+
+      // Get all cards
+      const allCards = db.query("SELECT * FROM cards").all() as Card[];
+
+      // Filter cards that have at least one matching keyword
+      const matchingCards: Card[] = [];
+      const matchingKeywords = new Set<string>();
+
+      for (const card of allCards) {
+        const keywords = parseKeywords(card.keywords);
+        const hasMatch = keywords.some(k => k.toLowerCase().includes(searchTerm as string));
+
+        if (hasMatch) {
+          matchingCards.push(card);
+          // Add matching keywords to the set
+          keywords.forEach(k => {
+            if (k.toLowerCase().includes(searchTerm as string)) {
+              matchingKeywords.add(k);
+            }
+          });
+        }
+      }
+
+      // Sort keywords alphabetically
+      const sortedKeywords = Array.from(matchingKeywords).sort();
+
+      return {
+        query: validation.sanitized,
+        keywords: sortedKeywords,
+        cards: matchingCards.map(card => ({
+          ...card,
+          keywords: parseKeywords(card.keywords)
+        }))
+      };
+    })
+
     .get("/cards/:id", ({ params: { id }, set }) => {
       // MOSAIC: Validate card ID before processing
       const validation = validateCardId(id);
