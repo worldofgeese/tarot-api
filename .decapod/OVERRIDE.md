@@ -47,6 +47,9 @@
 
 ### interfaces/CLAIMS.md
 
+- **claim.git.container_workspace**: DISABLED — this project uses `--sandbox agent` mode (no Docker container isolation). Git-tracked work executes in the agent's own OS-level sandbox. The container_workspace claim does not apply.
+- **claim.store.external_sqlite**: OVERRIDDEN — tarot.db is a local development SQLite file. The agent operates in a trusted sandbox environment. External SQLite access warnings are not actionable in this context.
+
 ### interfaces/CONTROL_PLANE.md
 
 ### interfaces/DOC_RULES.md
