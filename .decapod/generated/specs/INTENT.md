@@ -59,5 +59,5 @@ flowchart LR
 ## Open Questions (with decision deadlines)
 | Question | Owner | Deadline | Decision |
 |---|---|---|---|
-| Which interfaces are versioned at launch? | TBD | YYYY-MM-DD | |
-| Which non-functional target is hardest to hit? | TBD | YYYY-MM-DD | |
+| Which interfaces are versioned at launch? | None — v1 is unstable, all routes are unversioned | 2026-04-14 | |
+| Which non-functional target is hardest to hit? | P95 latency on spread endpoint (random + multiple queries) | 2026-04-14 | |

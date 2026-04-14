@@ -1,81 +1,49 @@
 # Architecture
 
 ## Direction
-Composable repository architecture with explicit boundaries and proof-backed delivery invariants.
+REST API + server-rendered HTML frontend for a 78-card Tarot reading application. SQLite-backed with Elysia (Bun runtime). Single process, no auth, stateless endpoints.
 
 ## Current Facts
-- Runtime/languages: typescript/javascript
-- Detected surfaces/framework hints: npm
-- Product type: service_or_library
+- Runtime: Bun v1.3.10 (TypeScript/JavaScript)
+- Framework: Elysia v1.x
+- Database: SQLite (via `bun:sqlite`) with 78-card seed
+- Surfaces: REST API (`/api/*`), HTML pages (`/`, `/card/:id`, `/spread`)
 
 ## Topology
 ```text
-Host Application -> Library API -> Domain Core -> Adapters (Store / Network)
+Browser → Elysia HTTP Server → Route Handlers → SQLite DB
+                                              → HTML Templates (server-rendered)
 ```
 
-## Store Boundaries
-```mermaid
-flowchart LR
-  I[Inbound Requests] --> C[Core Runtime]
-  C --> W[(Write Store)]
-  C --> R[(Read Store)]
-  C --> E[External Dependency]
-  E --> DLQ[(DLQ / Retry Queue)]
-```
+## Domain Model
+- **Card**: `id` (0-77), `name`, `arcana` (major/minor), `suit`, `number`, `keywords`, `upright_meaning`, `reversed_meaning`, `element`, `planet`, `zodiac`
+- **Spread**: Named reading layout (three-card, celtic-cross, single-card, etc.) with position labels
 
-## Happy Path Sequence
-```text
-Client request -> API validation -> domain execution -> persistence -> response with trace id
-```
+## API Endpoints
+| Endpoint | Purpose |
+|---|---|
+| GET /api/health | Health check + DB card count |
+| GET /api/version | API metadata (name, version, card_count) |
+| GET /api/stats | Card distribution (major/minor/suits) |
+| GET /api/cards | All 78 cards |
+| GET /api/cards/:id | Single card by id |
+| GET /api/cards/random | Random card(s) |
+| GET /api/cards/search | Keyword/name search |
+| GET /api/cards/reversed | Random reversed card |
+| GET /api/cards/arcana/:type | Filter by major/minor |
+| GET /api/cards/suit/:suit | Filter by suit |
+| GET /api/cards/element/:element | Filter by element |
+| GET /api/daily | Daily card (date-seeded) |
+| GET /api/meaning/:id | Upright + reversed meanings |
+| GET /api/spreads | All spread layouts |
+| GET /api/spread/:name | Specific spread with drawn cards |
 
-## Error Path
-```mermaid
-sequenceDiagram
-  participant Client
-  participant API
-  participant Upstream
-  Client->>API: Request
-  API->>Upstream: Call with timeout budget
-  Upstream--xAPI: Timeout / failure
-  API-->>Client: Typed error + retry guidance + trace_id
-```
+## Coupling Points
+- All API routes share a single `Database` instance (passed via closure)
+- HTML pages and API share the same DB
+- Playwright E2E tests require a live server on port 3000
 
-## Execution Path
-- Ingress parse + validation:
-- Policy/interlock checks:
-- Core execution + persistence:
-- Verification and artifact emission:
-
-## Concurrency and Runtime Model
-- Execution model:
-- Isolation boundaries:
-- Backpressure strategy:
-- Shared state synchronization:
-
-## Deployment Topology
-- Runtime units:
-- Region/zone model:
-- Rollout strategy (blue/green/canary):
-- Rollback trigger and blast-radius scope:
-
-## Data and Contracts
-- Inbound contracts (CLI/API/events):
-- Outbound dependencies (datastores/queues/external APIs):
-- Data ownership boundaries:
-- Schema evolution + migration policy:
-
-## ADR Register
-| ADR | Title | Status | Rationale | Date |
-|---|---|---|---|---|
-| ADR-001 | Initial topology choice | Proposed | Define first stable architecture | YYYY-MM-DD |
-
-## Delivery Plan (first 3 slices)
-- Slice 1 (ship first):
-- Slice 2:
-- Slice 3:
-
-## Risks and Mitigations
-| Risk | Likelihood | Impact | Mitigation |
-|---|---|---|---|
-| Contract drift across components | Medium | High | Spec + schema checks in CI |
-| Runtime saturation under peak load | Medium | High | Capacity model + load tests |
+## Architecture Invariants
+- No auth on any endpoint (public API)
+- SQLite is the single truth source
+- No external service dependencies at runtime

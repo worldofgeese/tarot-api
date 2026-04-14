@@ -11,9 +11,9 @@
 ## Service Level Objectives
 | SLI | SLO Target | Measurement Window | Owner |
 |---|---|---|---|
-| Availability | 99.9% | 30d | TBD |
-| P95 latency | TBD | 7d | TBD |
-| Error rate | < 1% | 7d | TBD |
+| Availability | 99.9% | 30d | Forgejo CI green |
+| P95 latency | < 50ms | 7d | Bun test timing logs |
+| Error rate | < 1% | 7d | Bun test failure rate |
 
 ## Monitoring
 | Signal | Metric | Threshold | Alert |
@@ -32,9 +32,9 @@
 ## Alerting and Runbooks
 | Alert | Severity | Runbook Link | Escalation |
 |---|---|---|---|
-| API error rate spike | Sev2 | TBD | App on-call |
-| Persistent dependency timeout | Sev1 | TBD | App + platform |
-| Validation gate outage | Sev2 | TBD | Maintainers |
+| API error rate spike | Sev2 | 2026-04-14 | Kypris (agent) |
+| Persistent dependency timeout | N/A — no external dependencies | 2026-04-14 | |
+| Validation gate outage | Sev2 | 2026-04-14 | Kypris (agent) |
 
 ## Incident Response
 - Incident commander model:
