@@ -1,0 +1,14 @@
+type: command/shell
+typeVersion: 2026.02.09.1
+id: 4afa31cf-eb5b-449c-a4e2-d4bbc8f960eb
+name: tarot-api-health-check
+version: 1
+tags:
+  project: tarot-api
+  purpose: behavioral-review
+globalArguments:
+  run: "curl -sf http://localhost:3000/api/health"
+  workingDir: /home/node/.openclaw/workspace/projects/tarot-api
+  timeout: 10000
+  ignoreExitCode: true
+methods: {}

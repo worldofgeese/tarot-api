@@ -1,0 +1,68 @@
+id: a95e118b-dd50-4d97-9116-4f41d6f8ca21
+name: tarot-api-behavioral-review
+tags:
+  project: tarot-api
+  purpose: behavioral-review
+jobs:
+  - name: health-checks
+    description: Run all behavioral checks against the live Tarot API
+    steps:
+      - name: health-check
+        description: Verify /api/health returns ok with 78 cards
+        task:
+          type: model_method
+          modelIdOrName: tarot-api-health-check
+          methodName: execute
+          inputs:
+            run: "curl -sf http://localhost:3000/api/health"
+            workingDir: /home/node/.openclaw/workspace/projects/tarot-api
+            timeout: 10000
+            ignoreExitCode: false
+        dependsOn: []
+        weight: 0
+        allowFailure: false
+      - name: version-check
+        description: Verify /api/version returns correct metadata
+        task:
+          type: model_method
+          modelIdOrName: tarot-api-health-check
+          methodName: execute
+          inputs:
+            run: "curl -sf http://localhost:3000/api/version"
+            workingDir: /home/node/.openclaw/workspace/projects/tarot-api
+            timeout: 10000
+            ignoreExitCode: false
+        dependsOn: []
+        weight: 0
+        allowFailure: false
+      - name: stats-check
+        description: Verify /api/stats returns 78 total cards
+        task:
+          type: model_method
+          modelIdOrName: tarot-api-health-check
+          methodName: execute
+          inputs:
+            run: "curl -sf http://localhost:3000/api/stats"
+            workingDir: /home/node/.openclaw/workspace/projects/tarot-api
+            timeout: 10000
+            ignoreExitCode: false
+        dependsOn: []
+        weight: 0
+        allowFailure: false
+      - name: card-count-check
+        description: Verify all 78 cards are returned
+        task:
+          type: model_method
+          modelIdOrName: tarot-api-health-check
+          methodName: execute
+          inputs:
+            run: "curl -sf http://localhost:3000/api/cards | python3 -c \"import json,sys; cards=json.load(sys.stdin); assert len(cards)==78, f'Expected 78 cards, got {len(cards)}'; print(f'OK: {len(cards)} cards')\""
+            workingDir: /home/node/.openclaw/workspace/projects/tarot-api
+            timeout: 15000
+            ignoreExitCode: false
+        dependsOn: []
+        weight: 0
+        allowFailure: false
+    dependsOn: []
+    weight: 0
+version: 1
