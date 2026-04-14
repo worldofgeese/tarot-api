@@ -1,8 +1,10 @@
 import { test, expect } from "bun:test";
 import { chromium } from "playwright";
-import { launchOptions } from "./playwright-config";
+
+// Playwright reads PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH automatically (set by setup.ts)
+// Never hardcode executablePath or launch args here.
 test("spread page draws 3 cards on button click", async () => {
-  const browser = await chromium.launch(launchOptions);
+  const browser = await chromium.launch();
   const context = await browser.newContext();
   const page = await context.newPage();
 
@@ -22,7 +24,7 @@ test("spread page draws 3 cards on button click", async () => {
 });
 
 test("spread page draws 10 cards for celtic cross", async () => {
-  const browser = await chromium.launch(launchOptions);
+  const browser = await chromium.launch();
   const context = await browser.newContext();
   const page = await context.newPage();
 
@@ -42,7 +44,7 @@ test("spread page draws 10 cards for celtic cross", async () => {
 });
 
 test("spread page draws 1 card for single card", async () => {
-  const browser = await chromium.launch(launchOptions);
+  const browser = await chromium.launch();
   const context = await browser.newContext();
   const page = await context.newPage();
 
@@ -62,7 +64,7 @@ test("spread page draws 1 card for single card", async () => {
 });
 
 test("drawn cards show card names", async () => {
-  const browser = await chromium.launch(launchOptions);
+  const browser = await chromium.launch();
   const context = await browser.newContext();
   const page = await context.newPage();
 

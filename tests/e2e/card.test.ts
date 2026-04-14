@@ -1,8 +1,10 @@
 import { test, expect } from "bun:test";
 import { chromium } from "playwright";
-import { launchOptions } from "./playwright-config";
+
+// Playwright reads PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH automatically (set by setup.ts)
+// Never hardcode executablePath or launch args here.
 test("card detail page renders all fields", async () => {
-  const browser = await chromium.launch(launchOptions);
+  const browser = await chromium.launch();
   const context = await browser.newContext();
   const page = await context.newPage();
 
@@ -28,7 +30,7 @@ test("card detail page renders all fields", async () => {
 });
 
 test("card detail page shows The Fool for id 0", async () => {
-  const browser = await chromium.launch(launchOptions);
+  const browser = await chromium.launch();
   const context = await browser.newContext();
   const page = await context.newPage();
 
@@ -41,7 +43,7 @@ test("card detail page shows The Fool for id 0", async () => {
 });
 
 test("invalid card id shows 404", async () => {
-  const browser = await chromium.launch(launchOptions);
+  const browser = await chromium.launch();
   const context = await browser.newContext();
   const page = await context.newPage();
 

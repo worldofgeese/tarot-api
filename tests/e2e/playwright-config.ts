@@ -1,33 +1,14 @@
 /**
- * playwright-config.ts — shared Playwright launch config for bun:test E2E tests
- * Reads from /home/node/.openclaw/devbox-env/.playwright/cli.config.json
- * This is the canonical source — never hardcode executablePath or args.
+ * playwright-config.ts — documents the Playwright env var setup for E2E tests.
+ *
+ * The correct pattern in this workspace:
+ *   - setup.ts sets PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH to the Nix Chromium binary
+ *   - chromium.launch() picks it up automatically — no executablePath in launch() calls
+ *   - cli.config.json is the source of truth for the path
+ *
+ * Do NOT pass executablePath or custom args in chromium.launch() calls.
+ * Do NOT use playwright-cli's config file directly in tests.
+ * Just: chromium.launch() — setup.ts handles the rest.
  */
 
-import { readFileSync } from "fs";
-import type { LaunchOptions } from "playwright";
-
-const CONFIG_PATH = "/home/node/.openclaw/devbox-env/.playwright/cli.config.json";
-
-interface CliConfig {
-  browser?: {
-    launchOptions?: LaunchOptions;
-  };
-}
-
-function loadLaunchOptions(): LaunchOptions {
-  try {
-    const raw = readFileSync(CONFIG_PATH, "utf-8");
-    const config: CliConfig = JSON.parse(raw);
-    return config.browser?.launchOptions ?? {};
-  } catch {
-    // Fallback if config not found — should not happen
-    console.warn("playwright-config: could not read cli.config.json, using defaults");
-    return {
-      executablePath: "/home/node/.openclaw/devbox-env/.devbox/nix/profile/default/bin/chromium",
-      args: ["--no-sandbox", "--disable-dev-shm-usage", "--disable-gpu"],
-    };
-  }
-}
-
-export const launchOptions: LaunchOptions = loadLaunchOptions();
+export {}; // keep as module
