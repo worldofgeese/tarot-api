@@ -119,13 +119,14 @@ export const model = {
         const latestRun = data.workflow_runs[0];
 
         // Transform and validate the run data
+        // NOTE: Forgejo API uses 'commit_sha', 'created', 'updated' (not head_sha/created_at/updated_at)
         const workflowRun = {
           id: latestRun.id,
           status: latestRun.status,
-          commit_sha: latestRun.head_sha,
+          commit_sha: latestRun.commit_sha,
           workflow_name: args.workflow_name,
-          created_at: latestRun.created_at,
-          updated_at: latestRun.updated_at,
+          created_at: latestRun.created,
+          updated_at: latestRun.updated,
         };
 
         // Validate with Zod schema
