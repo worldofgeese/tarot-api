@@ -1,0 +1,24 @@
+id: 14e140e7-cbe0-4d13-ba55-03a0cfa90e64
+name: forgejo-ci-monitor
+description: Monitor Forgejo CI pipeline - fetch latest run status and logs
+tags:
+  project: tarot-api
+  purpose: ci-monitoring
+jobs:
+  - name: check-ci-status
+    description: Fetch latest CI workflow run status from Forgejo
+    steps:
+      - name: get-latest-run
+        description: Retrieve most recent CI run for ci.yaml workflow
+        task:
+          type: model_method
+          modelIdOrName: tarot-api-ci
+          methodName: get_latest_run
+          inputs:
+            workflow_name: ci.yaml
+        dependsOn: []
+        weight: 0
+        allowFailure: false
+    dependsOn: []
+    weight: 0
+version: 1
