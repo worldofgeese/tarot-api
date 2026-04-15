@@ -1,4 +1,7 @@
-import { z } from "npm:zod@4";
+// Swamp extension models use Deno's npm: specifier in bundled versions.
+// For local development and testing, we use the installed 'zod' package.
+// The Swamp bundler resolves this correctly at publish time via manifest.yaml.
+import { z } from "zod";
 
 // Zod schema for Forgejo workflow run data
 const WorkflowRunSchema = z.object({
