@@ -1,0 +1,12 @@
+type: '@tarot/forgejo-ci'
+typeVersion: 2026.04.15.1
+id: 30318649-2849-47c1-a9ec-27175c6838c8
+name: tarot-api-ci
+version: 1
+tags: {}
+globalArguments:
+  base_url: 'https://paphos.hound-celsius.ts.net/api/v1'
+  repo_owner: kypris
+  repo_name: tarot-api
+  token: ${{ vault.get(forgejo-api, token) }}
+methods: {}

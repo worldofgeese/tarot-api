@@ -1,0 +1,7 @@
+id: cab236c2-acdd-47cf-9dee-e46af8b29284
+name: forgejo-api
+type: local_encryption
+config:
+  auto_generate: true
+  base_dir: /home/node/.openclaw/workspace/projects/tarot-api
+createdAt: '2026-04-15T05:37:38.031Z'
