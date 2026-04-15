@@ -1,7 +1,6 @@
-// Swamp extension models use Deno's npm: specifier in bundled versions.
-// For local development and testing, we use the installed 'zod' package.
-// The Swamp bundler resolves this correctly at publish time via manifest.yaml.
-import { z } from "zod";
+// Swamp extension models require npm:zod@4 (Deno specifier).
+// Swamp's bundler resolves this via Deno; bun maps it via node_modules/zod.
+import { z } from "npm:zod@4";
 
 // Zod schema for Forgejo workflow run data
 const WorkflowRunSchema = z.object({
@@ -100,7 +99,7 @@ export const model = {
         if (!response.ok) {
           if (response.status === 401 || response.status === 403) {
             throw new Error(
-              `Authentication failed (${response.status}). Check your token.`
+              `Authentication failed (${response.status}). Check your token in the vault or rotate via Forgejo user settings.`
             );
           }
           throw new Error(
@@ -255,12 +254,12 @@ export const model = {
         if (!response.ok) {
           if (response.status === 401 || response.status === 403) {
             throw new Error(
-              `Authentication failed (${response.status}). Check your token.`
+              `Authentication failed (${response.status}). Check your token in the vault or rotate via Forgejo user settings.`
             );
           }
           if (response.status === 404) {
             throw new Error(
-              `Run not found: ${args.run_id}. The run may not exist or logs may not be available yet.`
+              `Run not found: ${args.run_id}. Logs may not yet be available - try again after the run completes.`
             );
           }
           throw new Error(
@@ -270,6 +269,11 @@ export const model = {
 
         // Logs are returned as plain text
         const logs = await response.text();
+
+        // Handle case where logs are pending (empty response)
+        if (!logs || logs.trim().length === 0) {
+          context.logger.warn(`Logs for run ${args.run_id} are pending or empty.`);
+        }
 
         const runLogs = {
           run_id: args.run_id,
