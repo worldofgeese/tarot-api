@@ -1,0 +1,6 @@
+name: keywords-endpoint
+created: 2026-04-14T23:22:00Z
+status: active
+description: |
+  Add GET /api/cards/keywords endpoint that returns all unique keywords
+  from all 78 tarot cards as a sorted array of strings
