@@ -83,7 +83,7 @@ export const model = {
         workflow_name: z.string(),
       }),
       execute: async (args: { workflow_name: string }, context: any) => {
-        const { base_url, repo_owner, repo_name, token, username, password } = context.globalArgs;
+        const { base_url, repo_owner, repo_name, token } = context.globalArgs;
 
         context.logger.info(
           `Fetching latest run for workflow: ${args.workflow_name}`
@@ -92,7 +92,7 @@ export const model = {
         // Forgejo API endpoint for workflow runs
         const url = `${base_url}/repos/${repo_owner}/${repo_name}/actions/runs?workflow_id=${args.workflow_name}&limit=1`;
 
-        const response = await forgejoFetch(url, { token, username, password });
+        const response = await forgejoFetch(url, token);
 
         if (!response.ok) {
           if (response.status === 401 || response.status === 403) {
@@ -160,7 +160,7 @@ export const model = {
         args: { workflow_name: string; branch: string; inputs?: Record<string, unknown> },
         context: any
       ) => {
-        const { base_url, repo_owner, repo_name, token, username, password } = context.globalArgs;
+        const { base_url, repo_owner, repo_name, token } = context.globalArgs;
 
         context.logger.info(
           `Triggering workflow: ${args.workflow_name} on branch: ${args.branch}`
@@ -174,7 +174,7 @@ export const model = {
           inputs: args.inputs || {},
         };
 
-        const response = await forgejoFetch(url, { token, username, password }, {
+        const response = await forgejoFetch(url, token, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -240,14 +240,14 @@ export const model = {
         run_id: z.number(),
       }),
       execute: async (args: { run_id: number }, context: any) => {
-        const { base_url, repo_owner, repo_name, token, username, password } = context.globalArgs;
+        const { base_url, repo_owner, repo_name, token } = context.globalArgs;
 
         context.logger.info(`Fetching logs for run ID: ${args.run_id}`);
 
         // Forgejo API endpoint for run logs
         const url = `${base_url}/repos/${repo_owner}/${repo_name}/actions/runs/${args.run_id}/logs`;
 
-        const response = await forgejoFetch(url, { token, username, password });
+        const response = await forgejoFetch(url, token);
 
         if (!response.ok) {
           if (response.status === 401 || response.status === 403) {
