@@ -16,7 +16,7 @@ describe("GET /api/cards/random (filter-aware)", () => {
     const res = await app.handle(new Request("http://localhost/api/cards/random?suit=wands"));
     const data = await res.json();
     expect(res.status).toBe(200);
-    expect(data.suit).toBe("Wands");
+    expect(data.suit).toBe("wands");
   });
 
   it("returns random major arcana card when arcana=major", async () => {
@@ -31,7 +31,7 @@ describe("GET /api/cards/random (filter-aware)", () => {
     const res = await app.handle(new Request("http://localhost/api/cards/random?suit=cups&arcana=minor"));
     const data = await res.json();
     expect(res.status).toBe(200);
-    expect(data.suit).toBe("Cups");
+    expect(data.suit).toBe("cups");
   });
 
   it("returns 400 for invalid suit", async () => {
@@ -65,7 +65,7 @@ describe("GET /api/cards/filter (listing companion)", () => {
     expect(res.status).toBe(200);
     expect(Array.isArray(data)).toBe(true);
     expect(data.length).toBe(14); // 14 cards per suit
-    expect(data.every((card: any) => card.suit === "Wands")).toBe(true);
+    expect(data.every((card: any) => card.suit === "wands")).toBe(true);
   });
 
   it("returns all major arcana cards when arcana=major", async () => {

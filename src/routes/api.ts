@@ -319,7 +319,7 @@ export function apiRoutes(db: Database) {
     })
 
     .get("/cards/random", ({ query, set }) => {
-      const { count = "1" } = query;
+      const { count = "1", suit, arcana } = query;
       const countNum = parseInt(count as string);
 
       if (isNaN(countNum) || countNum < 1 || countNum > 10) {
@@ -327,13 +327,59 @@ export function apiRoutes(db: Database) {
         return { error: "Count must be between 1 and 10" };
       }
 
-      const randomQuery = db.query(`
-        SELECT * FROM cards
-        ORDER BY RANDOM()
-        LIMIT ?
-      `);
+      // Validate suit parameter if provided
+      if (suit) {
+        const normalizedSuit = (suit as string).toLowerCase();
+        const validSuits = ["wands", "cups", "swords", "pentacles"];
+        if (!validSuits.includes(normalizedSuit)) {
+          set.status = 400;
+          return { error: "Invalid suit. Must be one of: wands, cups, swords, pentacles" };
+        }
+      }
 
-      const cards = randomQuery.all(countNum) as Card[];
+      // Validate arcana parameter if provided
+      if (arcana) {
+        const normalizedArcana = (arcana as string).toLowerCase();
+        if (normalizedArcana !== "major" && normalizedArcana !== "minor") {
+          set.status = 400;
+          return { error: "Invalid arcana type. Use 'major' or 'minor'" };
+        }
+      }
+
+      // Build query with filters
+      let sql = "SELECT * FROM cards";
+      const params: any[] = [];
+      const conditions: string[] = [];
+
+      if (suit) {
+        conditions.push("suit = ? COLLATE NOCASE");
+        params.push(suit as string);
+      }
+
+      if (arcana) {
+        const normalizedArcana = (arcana as string).toLowerCase();
+        if (normalizedArcana === "major") {
+          conditions.push("(suit IS NULL OR suit = '')");
+        } else {
+          conditions.push("(suit IS NOT NULL AND suit != '')");
+        }
+      }
+
+      if (conditions.length > 0) {
+        sql += " WHERE " + conditions.join(" AND ");
+      }
+
+      sql += " ORDER BY RANDOM() LIMIT ?";
+      params.push(countNum);
+
+      const randomQuery = db.query(sql);
+      const cards = randomQuery.all(...params) as Card[];
+
+      // Check if no cards matched the filters
+      if (cards.length === 0) {
+        set.status = 404;
+        return { error: "No cards match the given filters" };
+      }
 
       const formattedCards = cards.map(card => ({
         ...card,
@@ -341,6 +387,63 @@ export function apiRoutes(db: Database) {
       }));
 
       return countNum === 1 ? formattedCards[0] : formattedCards;
+    })
+
+    .get("/cards/filter", ({ query, set }) => {
+      const { suit, arcana, limit = "100", offset = "0" } = query;
+
+      // Validate suit parameter if provided
+      if (suit) {
+        const normalizedSuit = (suit as string).toLowerCase();
+        const validSuits = ["wands", "cups", "swords", "pentacles"];
+        if (!validSuits.includes(normalizedSuit)) {
+          set.status = 400;
+          return { error: "Invalid suit. Must be one of: wands, cups, swords, pentacles" };
+        }
+      }
+
+      // Validate arcana parameter if provided
+      if (arcana) {
+        const normalizedArcana = (arcana as string).toLowerCase();
+        if (normalizedArcana !== "major" && normalizedArcana !== "minor") {
+          set.status = 400;
+          return { error: "Invalid arcana type. Use 'major' or 'minor'" };
+        }
+      }
+
+      // Build query with filters
+      let sql = "SELECT * FROM cards";
+      const params: any[] = [];
+      const conditions: string[] = [];
+
+      if (suit) {
+        conditions.push("suit = ? COLLATE NOCASE");
+        params.push(suit as string);
+      }
+
+      if (arcana) {
+        const normalizedArcana = (arcana as string).toLowerCase();
+        if (normalizedArcana === "major") {
+          conditions.push("(suit IS NULL OR suit = '')");
+        } else {
+          conditions.push("(suit IS NOT NULL AND suit != '')");
+        }
+      }
+
+      if (conditions.length > 0) {
+        sql += " WHERE " + conditions.join(" AND ");
+      }
+
+      sql += " LIMIT ? OFFSET ?";
+      params.push(parseInt(limit as string), parseInt(offset as string));
+
+      const queryObj = db.query(sql);
+      const cards = queryObj.all(...params) as Card[];
+
+      return cards.map(card => ({
+        ...card,
+        keywords: parseKeywords(card.keywords)
+      }));
     })
 
     .get("/daily", ({ query, set }) => {
