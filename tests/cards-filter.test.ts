@@ -1,7 +1,30 @@
-import { describe, it, expect } from "bun:test";
+import { describe, it, expect, beforeAll, afterAll } from "bun:test";
 import createApp from "../src/index";
+import { seedDatabase } from "../src/db/seed";
+import { unlinkSync, existsSync } from "fs";
 
-const app = createApp(":memory:");
+const testDbPath = "/tmp/test-cards-filter.db";
+let app: any;
+
+beforeAll(() => {
+  // Clean up if exists
+  if (existsSync(testDbPath)) {
+    unlinkSync(testDbPath);
+  }
+
+  // Seed the test database
+  seedDatabase(testDbPath);
+
+  // Create app with seeded database
+  app = createApp(testDbPath);
+});
+
+afterAll(() => {
+  // Clean up test database
+  if (existsSync(testDbPath)) {
+    unlinkSync(testDbPath);
+  }
+});
 
 describe("GET /api/cards filter params", () => {
   it("returns all 78 cards when no params provided (no regression)", async () => {

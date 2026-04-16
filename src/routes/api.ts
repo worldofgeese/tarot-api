@@ -42,8 +42,35 @@ export function apiRoutes(db: Database) {
         cardCount
       };
     })
-    .get("/cards", ({ query }) => {
-      const { limit = "100", offset = "0", arcana, suit } = query;
+    .get("/cards", ({ query, set }) => {
+      const { suit, arcana, limit } = query;
+
+      // Validate suit parameter
+      if (suit !== undefined) {
+        const validSuits = ["wands", "cups", "swords", "pentacles"];
+        if (!validSuits.includes(suit as string)) {
+          set.status = 400;
+          return { error: "Invalid suit. Must be one of: wands, cups, swords, pentacles" };
+        }
+      }
+
+      // Validate arcana parameter
+      if (arcana !== undefined) {
+        const validArcana = ["major", "minor"];
+        if (!validArcana.includes(arcana as string)) {
+          set.status = 400;
+          return { error: "Invalid arcana type. Use 'major' or 'minor'" };
+        }
+      }
+
+      // Validate limit parameter
+      if (limit !== undefined) {
+        const limitNum = parseInt(limit as string);
+        if (isNaN(limitNum) || limitNum <= 0) {
+          set.status = 400;
+          return { error: "Invalid limit" };
+        }
+      }
 
       let sql = "SELECT * FROM cards";
       const params: any[] = [];
@@ -63,8 +90,10 @@ export function apiRoutes(db: Database) {
         sql += " WHERE " + conditions.join(" AND ");
       }
 
-      sql += " LIMIT ? OFFSET ?";
-      params.push(parseInt(limit as string), parseInt(offset as string));
+      if (limit !== undefined) {
+        sql += " LIMIT ?";
+        params.push(parseInt(limit as string));
+      }
 
       const queryObj = db.query(sql);
       const cards = queryObj.all(...params) as Card[];
