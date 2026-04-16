@@ -25,15 +25,21 @@ FJ_EX=/home/node/.openclaw/bin/fj-ex
 ## Mandatory Session Start (every worker, every time)
 
 ```bash
-# 1. Decapod session init — run IN THE WORKTREE, not the main project dir
+# 1. Decapod session init — IN THE WORKTREE, not main project dir
 /home/node/.openclaw/bin/decapod rpc --op agent.init
 # Read allowed_next_ops and blocked_by before proceeding
 
-# 2. ByteRover — check existing patterns before planning
+# 2. ByteRover — query existing patterns BEFORE planning
 /home/node/.openclaw/npm-global/bin/brv query "<feature keyword>"
 
 # 3. RPI plan artifact
 /rpi-plan   # creates .rpi/plans/<date>-<feature>.md
+
+# 4. Decapod lcm ingest — make plan an immutable hashed artifact
+/home/node/.openclaw/bin/decapod lcm ingest --kind spec --source .rpi/plans/<date>-<feature>.md
+
+# 5. Decapod internalize — stable context adapter for this session
+/home/node/.openclaw/bin/decapod internalize create --source .rpi/plans/<date>-<feature>.md --model summary
 ```
 
 ## Golden Rules
