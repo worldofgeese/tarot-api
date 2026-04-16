@@ -692,5 +692,92 @@ export function apiRoutes(db: Database) {
       }
 
       return reading;
+    })
+
+    .put("/readings/:id", ({ params: { id }, body, set }) => {
+      // Validate ID is numeric
+      const validation = validateCardId(id);
+      if (!validation.valid) {
+        set.status = 400;
+        return { error: validation.error };
+      }
+
+      const { spread_type, notes } = body as {
+        spread_type?: string;
+        notes?: string;
+      };
+
+      // At least one field required
+      if (spread_type === undefined && notes === undefined) {
+        set.status = 400;
+        return { error: "At least one field (notes or spread_type) is required" };
+      }
+
+      // Validate spread_type if provided
+      if (spread_type !== undefined) {
+        if (typeof spread_type !== "string") {
+          set.status = 400;
+          return { error: "spread_type must be a string" };
+        }
+        const validSpreadTypes = ["single", "three-card", "celtic-cross", "custom"];
+        if (!validSpreadTypes.includes(spread_type)) {
+          set.status = 400;
+          return { error: "Invalid spread_type. Must be one of: single, three-card, celtic-cross, custom" };
+        }
+      }
+
+      // Validate notes length if provided
+      if (notes !== undefined) {
+        if (typeof notes !== "string") {
+          set.status = 400;
+          return { error: "notes must be a string" };
+        }
+        if (notes.length > 2000) {
+          set.status = 400;
+          return { error: "notes must be 2000 characters or less" };
+        }
+      }
+
+      const numericId = parseInt(id, 10);
+
+      // Check if reading exists
+      const checkQuery = db.query("SELECT id FROM readings WHERE id = ?");
+      const exists = checkQuery.get(numericId);
+
+      if (!exists) {
+        set.status = 404;
+        return { error: "Reading not found" };
+      }
+
+      // Build dynamic UPDATE query
+      const updates: string[] = [];
+      const params: any[] = [];
+
+      if (spread_type !== undefined) {
+        updates.push("spread_type = ?");
+        params.push(spread_type);
+      }
+
+      if (notes !== undefined) {
+        updates.push("notes = ?");
+        params.push(notes);
+      }
+
+      params.push(numericId);
+
+      const updateSql = `UPDATE readings SET ${updates.join(", ")} WHERE id = ?`;
+      db.prepare(updateSql).run(...params);
+
+      // Fetch and return the updated reading
+      const selectQuery = db.query("SELECT * FROM readings WHERE id = ?");
+      const reading = selectQuery.get(numericId) as {
+        id: number;
+        spread_type: string;
+        cards_json: string;
+        notes: string | null;
+        created_at: string;
+      };
+
+      return reading;
     });
 }
