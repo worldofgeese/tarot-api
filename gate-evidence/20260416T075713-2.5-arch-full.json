@@ -1,0 +1,9 @@
+{
+  "gate": "2.5-arch-full",
+  "passed": true,
+  "duration_ms": 26112,
+  "evidence": "/home/node/.openclaw/workspace/projects/tarot-api/gate-evidence/gate25-result.txt",
+  "model": "claude-sonnet-4",
+  "detail": "**Recommendation**: Add automated API integration tests that verify actual HTTP responses match expe",
+  "ts": "2026-04-16T08:00:50+00:00"
+}

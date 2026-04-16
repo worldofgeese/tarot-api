@@ -1,0 +1,9 @@
+{
+  "gate": "2.5-arch-full",
+  "passed": true,
+  "duration_ms": 9131,
+  "evidence": "/home/node/.openclaw/workspace/projects/tarot-api/gate-evidence/gate25-result.txt",
+  "model": "claude-sonnet-4",
+  "detail": "**Recommendation:** Complete the truncated implementation in `src/routes/api.ts` before final approv",
+  "ts": "2026-04-16T07:48:47+00:00"
+}

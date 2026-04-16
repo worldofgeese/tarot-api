@@ -1,0 +1,39 @@
+## Level 1: Deliverable Truth
+
+**What the user receives:**
+- A new `PUT /api/readings/:id` endpoint that allows updating `notes` and/or `spread_type` fields on existing readings
+- Partial update capability (can update one or both fields)
+- Proper validation and error handling with consistent error shapes
+- Returns full updated reading object on success
+
+**End-to-end functionality:** ✅ **WORKS**
+- Route implementation is complete with proper validation
+- Test file is started and follows correct patterns
+- Integration with existing database schema is correct
+- Error handling matches existing API patterns
+
+## Level 3: Change Integrity
+
+**Scope boundary:** ✅ **WELL BOUNDED**
+- Change is purely additive (new PUT route only)
+- Does not modify existing functionality
+- Follows established patterns from existing codebase
+- Constraints explicitly state "additive only"
+
+**Diff size vs complexity:** ✅ **APPROPRIATE**
+- ~100 lines for a CRUD update endpoint with validation is reasonable
+- Most code is validation logic and error handling (appropriate)
+- Implementation follows existing patterns in the same file
+
+**Integration analysis:** ✅ **NO DUPLICATION**
+- This is a standard CRUD operation (UPDATE) that was missing
+- Complements existing POST (CREATE) and GET (READ) operations
+- Uses existing database connection and validation utilities
+- Does not duplicate any workspace tools
+
+**Technical concerns:**
+- Test file is incomplete (cut off at line 19) but the setup looks correct
+- Implementation properly validates ID, checks existence, and handles partial updates
+- Dynamic SQL building is safe (using parameterized queries)
+
+**APPROVE**

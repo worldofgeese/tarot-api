@@ -1,0 +1,9 @@
+{
+  "gate": "2.5-arch-full",
+  "passed": true,
+  "duration_ms": 28402,
+  "evidence": "/home/node/.openclaw/workspace/projects/tarot-api/gate-evidence/gate25-result.txt",
+  "model": "claude-sonnet-4",
+  "detail": "While no explicit baseline was pinned, this is a low-risk additive change that doesn't modify existi",
+  "ts": "2026-04-16T09:04:37+00:00"
+}

@@ -1,0 +1,16 @@
+=== Manual Exercise: Card Reversals Endpoint ===
+Date: Thu Apr 16 08:51:53 UTC 2026
+
+--- GET /api/cards/0/reversal (The Fool) ---
+{"id":0,"name":"The Fool","reversed":"Recklessness, taken advantage of, inconsideration"}
+--- GET /api/cards/1/reversal ---
+The Magician | reversed: Manipulation, poor planning, untapped talents
+
+--- GET /api/cards/999/reversal → 404 ---
+{"error":"Card not found"}
+HTTP 404
+--- GET /api/cards/abc/reversal → 400 ---
+{"error":"Invalid id"}
+HTTP 400
+--- Health check ---
+health OK, cards: 78

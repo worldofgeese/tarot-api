@@ -1,0 +1,9 @@
+{
+  "gate": "M-manual",
+  "passed": true,
+  "duration_ms": 8,
+  "evidence": "",
+  "model": "",
+  "detail": "Found 3 evidence artifacts",
+  "ts": "2026-04-16T09:03:12+00:00"
+}

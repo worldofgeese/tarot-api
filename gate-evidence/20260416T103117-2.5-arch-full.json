@@ -1,0 +1,9 @@
+{
+  "gate": "2.5-arch-full",
+  "passed": true,
+  "duration_ms": 10517,
+  "evidence": "/home/node/.openclaw/workspace/projects/tarot-api/gate-evidence/gate25-result.txt",
+  "model": "claude-sonnet-4",
+  "detail": "**Recommendation:** Request complete diff and test execution results before approval.",
+  "ts": "2026-04-16T10:33:40+00:00"
+}

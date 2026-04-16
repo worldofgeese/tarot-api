@@ -1,0 +1,7 @@
+[
+  {
+    "workflow": "tarot-api-behavioral-review",
+    "returncode": 0,
+    "output": "{\n  \"id\": \"9a0e850a-3166-461e-bc58-12135a36aac4\",\n  \"workflowId\": \"a95e118b-dd50-4d97-9116-4f41d6f8ca21\",\n  \"workflowName\": \"tarot-api-behavioral-review\",\n  \"status\": \"succeeded\",\n  \"jobs\": [\n    {\n      \"name\": \"health-checks\",\n      \"status\": \"succeeded\",\n      \"steps\": [\n        {\n          \"name\": \"health-check\",\n          \"status\": \"succeeded\",\n          \"duration\": 124,\n          \"dataArtifacts\": [\n            {\n              \"dataId\": \"3122892c-7084-431a-ba67-5226ebc7a408\",\n              "
+  }
+]

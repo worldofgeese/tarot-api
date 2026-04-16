@@ -1,0 +1,9 @@
+{
+  "gate": "1-structural",
+  "passed": true,
+  "duration_ms": 49292,
+  "evidence": "",
+  "model": "",
+  "detail": ".5: change integrity OK (165 diff lines) \u2713\n[gate] Running tests in /tmp/tarot-run3...\n[gate] Tests: 236 pass, 0 fail \u2713\n[gate] Playwright: closed all sessions (zombie prevention)\n[gate] No duplicate ro",
+  "ts": "2026-04-16T08:53:19+00:00"
+}

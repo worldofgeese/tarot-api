@@ -1,0 +1,9 @@
+{
+  "gate": "3-ci",
+  "passed": true,
+  "duration_ms": 13140,
+  "evidence": "/home/node/.openclaw/workspace/projects/tarot-api/gate-evidence/ci-result.txt",
+  "model": "",
+  "detail": "CI success",
+  "ts": "2026-04-16T10:28:34+00:00"
+}

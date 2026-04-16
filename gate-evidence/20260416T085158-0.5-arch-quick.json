@@ -1,0 +1,9 @@
+{
+  "gate": "0.5-arch-quick",
+  "passed": true,
+  "duration_ms": 15610,
+  "evidence": "/home/node/.openclaw/workspace/projects/tarot-api/gate-evidence/gate05-result.txt",
+  "model": "claude-sonnet-4",
+  "detail": "The core functionality is sound but the error message mismatch indicates either the plan assumption ",
+  "ts": "2026-04-16T08:52:30+00:00"
+}

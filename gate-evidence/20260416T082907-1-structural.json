@@ -1,0 +1,9 @@
+{
+  "gate": "1-structural",
+  "passed": false,
+  "duration_ms": 28675,
+  "evidence": "/home/node/.openclaw/workspace/projects/tarot-api/gate-evidence/test-failure.log",
+  "model": "",
+  "detail": "+ change integrity...\n[gate] Gate 0.5: deliverable truth OK (1 src, 1 test files)\n[gate] Gate 0.5: change integrity OK (162 diff lines) \u2713\n[gate] Running tests in /home/node/.openclaw/workspace/project",
+  "ts": "2026-04-16T08:30:08+00:00"
+}

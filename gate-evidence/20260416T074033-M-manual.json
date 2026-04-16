@@ -1,0 +1,9 @@
+{
+  "gate": "M-manual",
+  "passed": false,
+  "duration_ms": 1,
+  "evidence": "",
+  "model": "",
+  "detail": "No manual exercise evidence found. Run curl/playwright and save output to gate-evidence/.",
+  "ts": "2026-04-16T07:41:20+00:00"
+}

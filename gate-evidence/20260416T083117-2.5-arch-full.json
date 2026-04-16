@@ -1,0 +1,9 @@
+{
+  "gate": "2.5-arch-full",
+  "passed": true,
+  "duration_ms": 17755,
+  "evidence": "/home/node/.openclaw/workspace/projects/tarot-api/gate-evidence/gate25-result.txt",
+  "model": "claude-sonnet-4",
+  "detail": "**Risk Level:** MEDIUM - Core functionality appears sound but verification integrity is compromised.",
+  "ts": "2026-04-16T08:33:06+00:00"
+}

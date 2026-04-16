@@ -1,0 +1,9 @@
+{
+  "gate": "2-judge",
+  "passed": false,
+  "duration_ms": 50788,
+  "evidence": "/home/node/.openclaw/workspace/projects/tarot-api/gate-evidence/judge-result.txt",
+  "model": "",
+  "detail": "Risk: LOW",
+  "ts": "2026-04-16T10:24:58+00:00"
+}

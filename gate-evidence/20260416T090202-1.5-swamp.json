@@ -1,0 +1,9 @@
+{
+  "gate": "1.5-swamp",
+  "passed": true,
+  "duration_ms": 4531,
+  "evidence": "/home/node/.openclaw/workspace/projects/tarot-api/gate-evidence/swamp-behavioral.json",
+  "model": "",
+  "detail": "All 1 behavioral workflows passed",
+  "ts": "2026-04-16T09:03:12+00:00"
+}

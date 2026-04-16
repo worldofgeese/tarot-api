@@ -1,0 +1,18 @@
+CI status: success
+{
+  "baseUrl": "https://paphos.hound-celsius.ts.net",
+  "limit": 1,
+  "page": 1,
+  "repo": "kypris/tarot-api",
+  "runs": [
+    {
+      "branch": "agent/01kpas/reading-cards-update",
+      "createdAt": "2026-04-16T12:31:29+02:00",
+      "runIndex": 74,
+      "status": "Success",
+      "url": "https://paphos.hound-celsius.ts.net/kypris/tarot-api/actions/runs/74"
+    }
+  ],
+  "status": null,
+  "workflow": null
+}

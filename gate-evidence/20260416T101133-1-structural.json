@@ -1,0 +1,9 @@
+{
+  "gate": "1-structural",
+  "passed": true,
+  "duration_ms": 39671,
+  "evidence": "",
+  "model": "",
+  "detail": "stion, not logic errors.\n[gate]   E2E tests use cli.config.json (Nix Chromium). CI will validate in clean env.\n[gate]   Unit + integration: 240 pass \u2014 Gate 1 PASS (E2E advisory)\n[gate] No duplicate ro",
+  "ts": "2026-04-16T10:12:52+00:00"
+}

@@ -1,0 +1,9 @@
+{
+  "gate": "1-structural",
+  "passed": true,
+  "duration_ms": 25325,
+  "evidence": "",
+  "model": "",
+  "detail": "lines) \u2713\n[gate] Running tests in /home/node/.openclaw/workspace/projects/tarot-api...\n[gate] Tests: 219 pass, 0 fail \u2713\n[gate] Playwright: closed all sessions (zombie prevention)\n[gate] No duplicate ro",
+  "ts": "2026-04-16T07:41:20+00:00"
+}

@@ -1,0 +1,26 @@
+=== Manual Exercise: PUT /api/readings/:id ===
+Date: Thu Apr 16 10:11:28 UTC 2026
+
+--- Create reading ---
+ID: 73
+
+--- PUT update notes ---
+{"id":73,"spread_type":"single","cards_json":"[0]","notes":"Updated note","created_at":"2026-04-16 10:11:28"}
+--- PUT update spread_type ---
+{"id":73,"spread_type":"three-card","cards_json":"[0]","notes":"Updated note","created_at":"2026-04-16 10:11:28"}
+--- PUT partial (notes only) ---
+{"id":73,"spread_type":"three-card","cards_json":"[0]","notes":"Only notes updated","created_at":"2026-04-16 10:11:28"}
+--- PUT 9999 → 404 ---
+{"error":"Reading not found"}
+HTTP 404
+--- PUT invalid spread_type → 400 ---
+{"error":"Invalid spread_type. Must be one of: single, three-card, celtic-cross, custom"}
+HTTP 400
+--- PUT abc id → 400 ---
+{"error":"Invalid id"}
+HTTP 400
+--- PUT no fields → 400 ---
+{"error":"At least one field (notes or spread_type) is required"}
+HTTP 400
+--- Health check ---
+OK, cards: 78

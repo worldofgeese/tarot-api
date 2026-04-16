@@ -1,0 +1,9 @@
+{
+  "gate": "4-council",
+  "passed": false,
+  "duration_ms": 570,
+  "evidence": "/home/node/.openclaw/workspace/memory/council-reviews/20260416-075519",
+  "model": "",
+  "detail": "Verdict: UNKNOWN",
+  "ts": "2026-04-16T07:55:19+00:00"
+}

@@ -1,0 +1,19 @@
+=== Manual Exercise: Numerology Endpoint ===
+Date: Thu Apr 16 08:29:01 UTC 2026
+
+--- GET /api/cards/numerology/0 (The Fool) ---
+1 cards: ['The Fool']
+
+--- GET /api/cards/numerology/1 (Magician + Aces) ---
+5 cards: ['The Magician', 'Ace of Wands', 'Ace of Cups', 'Ace of Swords', 'Ace of Pentacles']
+
+--- GET /api/cards/numerology/99 (no match → []) ---
+[]
+--- GET /api/cards/numerology/abc (400) ---
+{"error":"Invalid number parameter. Must be a non-negative integer"}
+HTTP 400
+--- GET /api/cards/numerology/-1 (400 negative) ---
+{"error":"Invalid number parameter. Must be a non-negative integer"}
+HTTP 400
+--- Existing endpoints unaffected ---
+health OK, cards: 78

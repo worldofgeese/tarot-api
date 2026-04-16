@@ -1,0 +1,9 @@
+{
+  "gate": "0-lint",
+  "passed": true,
+  "duration_ms": 11683,
+  "evidence": "/home/node/.openclaw/workspace/projects/tarot-api/gate-evidence/soulforge-context.md",
+  "model": "",
+  "detail": "=== Gate 0: Mechanical Architectural Enforcement ===\n\n\u2192 SoulForge Gate 0 hint failed: \u001b[2m3 steps \u2014 14.5k in, 0.3k out, 93% cached \u2014 9.1s\u001b[0m\n\u2192 Checking cross-domain boundaries...\n\u2192 Checking file size",
+  "ts": "2026-04-16T10:26:28+00:00"
+}
