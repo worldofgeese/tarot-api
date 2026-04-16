@@ -504,6 +504,74 @@ export function apiRoutes(db: Database) {
       }));
     })
 
+    .get("/cards/filter", ({ query, set }) => {
+      const { suit, arcana, limit } = query;
+
+      // Validate suit if provided
+      if (suit) {
+        const normalizedSuit = (suit as string).toLowerCase();
+        const validSuits = ["wands", "cups", "swords", "pentacles"];
+        if (!validSuits.includes(normalizedSuit)) {
+          set.status = 400;
+          return { error: "Invalid suit. Must be one of: wands, cups, swords, pentacles" };
+        }
+      }
+
+      // Validate arcana if provided
+      if (arcana) {
+        const normalizedArcana = (arcana as string).toLowerCase();
+        if (normalizedArcana !== "major" && normalizedArcana !== "minor") {
+          set.status = 400;
+          return { error: "Invalid arcana type. Use 'major' or 'minor'" };
+        }
+      }
+
+      // Validate limit if provided
+      if (limit !== undefined) {
+        const limitNum = parseInt(limit as string);
+        if (isNaN(limitNum) || limitNum <= 0) {
+          set.status = 400;
+          return { error: "Invalid limit" };
+        }
+      }
+
+      // Build query
+      let sql = "SELECT * FROM cards";
+      const params: any[] = [];
+      const conditions: string[] = [];
+
+      if (suit) {
+        conditions.push("suit = ? COLLATE NOCASE");
+        params.push(suit as string);
+      }
+
+      if (arcana) {
+        const normalizedArcana = (arcana as string).toLowerCase();
+        if (normalizedArcana === "major") {
+          conditions.push("(suit IS NULL OR suit = '')");
+        } else {
+          conditions.push("(suit IS NOT NULL AND suit != '')");
+        }
+      }
+
+      if (conditions.length > 0) {
+        sql += " WHERE " + conditions.join(" AND ");
+      }
+
+      if (limit !== undefined) {
+        sql += " LIMIT ?";
+        params.push(parseInt(limit as string));
+      }
+
+      const queryObj = db.query(sql);
+      const cards = queryObj.all(...params) as Card[];
+
+      return cards.map(card => ({
+        ...card,
+        keywords: parseKeywords(card.keywords)
+      }));
+    })
+
     .get("/spreads", () => {
       return listSpreads();
     })
