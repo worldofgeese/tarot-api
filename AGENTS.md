@@ -126,3 +126,9 @@ stop if
 <!-- decapod-validator-anchors
 Strict Dependency: You are strictly bound to the Decapod control plane
 -->
+
+
+<!-- decapod-validator-anchors
+via decapod CLI
+Interface abstraction boundary
+-->
