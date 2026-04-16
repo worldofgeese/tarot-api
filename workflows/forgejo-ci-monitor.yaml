@@ -1,0 +1,18 @@
+name: forgejo-ci-monitor
+description: Monitor Forgejo CI workflow runs and retrieve logs
+
+jobs:
+  check-latest-run:
+    description: Fetch the latest workflow run status
+    model: tarot-api-ci
+    method: get_latest_run
+    inputs:
+      workflow_name: ci.yml
+
+  get-logs:
+    description: Retrieve logs if the run exists
+    model: tarot-api-ci
+    method: get_run_logs
+    when: data.latest("check-latest-run", "workflow_run").attributes.id != null
+    inputs:
+      run_id: data.latest("check-latest-run", "workflow_run").attributes.id

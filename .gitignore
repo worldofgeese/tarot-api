@@ -46,3 +46,5 @@ reports/
 scripts/__pycache__/
 .soulforge
 .playwright-cli/
+.brv/
+prompts/
