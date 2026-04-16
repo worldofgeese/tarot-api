@@ -41,6 +41,6 @@ describe("GET /api/cards/:id/reversal", () => {
     const response = await fetch(`${baseUrl}/api/cards/abc/reversal`);
     expect(response.status).toBe(400);
     const data = await response.json();
-    expect(data).toEqual({ error: "Invalid card id" });
+    expect(data).toEqual({ error: "Invalid id" });
   });
 });

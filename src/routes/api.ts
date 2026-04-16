@@ -210,6 +210,29 @@ export function apiRoutes(db: Database) {
       };
     })
 
+    .get("/cards/:id/reversal", ({ params: { id }, set }) => {
+      const validation = validateCardId(id);
+      if (!validation.valid) {
+        set.status = 400;
+        return { error: validation.error };
+      }
+
+      const numericId = parseInt(id);
+      const query = db.query("SELECT id, name, reversed_meaning FROM cards WHERE id = ?");
+      const card = query.get(numericId) as { id: number; name: string; reversed_meaning: string } | null;
+
+      if (!card) {
+        set.status = 404;
+        return { error: "Card not found" };
+      }
+
+      return {
+        id: card.id,
+        name: card.name,
+        reversed: card.reversed_meaning
+      };
+    })
+
     .get("/spread/:type", ({ params: { type }, query, set }) => {
       try {
         // Special handling for "single" type with count parameter
