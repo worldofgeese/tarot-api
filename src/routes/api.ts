@@ -715,6 +715,10 @@ export function apiRoutes(db: Database) {
 
       // Validate spread_type if provided
       if (spread_type !== undefined) {
+        if (typeof spread_type !== "string") {
+          set.status = 400;
+          return { error: "spread_type must be a string" };
+        }
         const validSpreadTypes = ["single", "three-card", "celtic-cross", "custom"];
         if (!validSpreadTypes.includes(spread_type)) {
           set.status = 400;

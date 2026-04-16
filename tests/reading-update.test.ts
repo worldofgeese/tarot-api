@@ -132,4 +132,27 @@ describe("PUT /api/readings/:id", () => {
     );
     expect(res.status).toBe(200);
   });
+
+  it("returns 400 if notes is not a string (malformed body)", async () => {
+    const res = await app.handle(
+      new Request(`http://localhost/api/readings/${readingId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ notes: 42 }),
+      })
+    );
+    expect(res.status).toBe(400);
+  });
+
+  it("returns 400 if spread_type is not a string (malformed body)", async () => {
+    const res = await app.handle(
+      new Request(`http://localhost/api/readings/${readingId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ spread_type: null }),
+      })
+    );
+    expect(res.status).toBe(400);
+  });
 });
+
