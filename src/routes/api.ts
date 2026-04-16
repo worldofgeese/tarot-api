@@ -566,12 +566,16 @@ export function apiRoutes(db: Database) {
         return { error: "cards_json is required" };
       }
 
-      // Validate cards_json is valid JSON array
+      // Validate cards_json is valid JSON array of integers
       try {
         const parsed = JSON.parse(cards_json);
         if (!Array.isArray(parsed)) {
           set.status = 400;
           return { error: "cards_json must be a valid JSON array" };
+        }
+        if (!parsed.every((el: unknown) => Number.isInteger(el))) {
+          set.status = 400;
+          return { error: "cards_json must be a JSON array of integer card IDs" };
         }
       } catch (error) {
         set.status = 400;

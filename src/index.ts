@@ -4,8 +4,8 @@ import { initDatabase } from "./db/schema";
 import { apiRoutes } from "./routes/api";
 import { pageRoutes } from "./routes/pages";
 
-export default function createApp() {
-  const db = initDatabase();
+export default function createApp(dbPath: string = "data/tarot.db") {
+  const db = initDatabase(dbPath);
 
   const app = new Elysia()
     .use(staticPlugin({

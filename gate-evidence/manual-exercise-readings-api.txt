@@ -1,0 +1,22 @@
+=== Manual Exercise: Readings API ===
+Date: Thu Apr 16 07:34:06 UTC 2026
+
+--- POST /api/readings (valid, with notes) ---
+{"id":21,"spread_type":"three-card","cards_json":"[1,5,22]","notes":"Morning reading","created_at":"2026-04-16 07:34:06"}
+Created ID: 21
+
+--- POST /api/readings (no notes) ---
+{"id":22,"spread_type":"single","cards_json":"[0]","notes":null,"created_at":"2026-04-16 07:34:06"}
+--- GET /api/readings (list) ---
+[{"id":21,"spread_type":"three-card","cards_json":"[1,5,22]","notes":"Morning reading","created_at":"2026-04-16 07:34:06"},{"id":22,"spread_type":"single","cards_json":"[0]","notes":null,"created_at":"2026-04-16 07:34:06"},{"id":17,"spread_type":"three-card","cards_json":"[1,5,22]","notes":"My first reading","created_at":"2026-04-16 07:33:11"},{"id":18,"spread_type":"single","cards_json":"[0]","notes":null,"created_at":"2026-04-16 07:33:11"},{"id":19,"spread_type":"single","cards_json":"[0]","notes":"Test reading for list","created_at":"2026-04-16 07:33:11"},{"id":20,"spread_type":"three-card","cards_json":"[5,10,15]","notes":"Past, present, future","created_at":"2026-04-16 07:33:11"},{"id":14,"spread_type":"single","cards_json":"[0]","notes":null,"created_at":"2026-04-16 07:32:46"},{"id":15,"spread_type":"single","cards_json":"[0]","notes":"Test reading for list","created_at":"2026-04-16 07:32:46"},{"id":16,"spread_type":"three-card","cards_json":"[5,10,15]","notes":"Past, present, future","created_at":"2026-04-16 07:32:46"},{"id":13,"spread_type":"three-card","cards_json":"[1,5,22]","notes":"My first reading","created_at":"2026-04-16 07:32:45"}]
+--- GET /api/readings/21 (by id) ---
+{"id":21,"spread_type":"three-card","cards_json":"[1,5,22]","notes":"Morning reading","created_at":"2026-04-16 07:34:06"}
+--- GET /api/readings/999 (404) ---
+{"error":"Reading not found"}
+HTTP 404
+--- POST invalid spread_type (400) ---
+{"error":"Invalid spread_type. Must be one of: single, three-card, celtic-cross, custom"}
+--- POST invalid JSON cards (400) ---
+{"error":"cards_json must be valid JSON"}
+--- Existing routes unaffected ---
+health OK, cards: 78
