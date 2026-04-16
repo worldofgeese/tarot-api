@@ -1,6 +1,7 @@
 # CLAUDE.md — Tarot API Agent Contract
 
 > Read this before touching any code. It is the binding contract for all agents in this repo.
+> **AGENTS.md exists for other harnesses (Codex, Amp, Cursor) but CLAUDE.md is what Claude Code reads deterministically. Everything critical lives here.**
 
 ## Project
 
@@ -10,31 +11,49 @@ Live at: `http://localhost:3000`
 ## Toolchain (exact binary paths)
 
 ```bash
-# These are the actual paths. Do not guess or install alternatives.
+export PATH="/home/node/.openclaw/bin:/home/node/.openclaw/npm-global/bin:/home/node/.local/bin:$PATH"
+
+# Do not guess or install alternatives. These are the actual paths:
 DECAPOD=/home/node/.openclaw/bin/decapod
 RPI=/home/node/.local/bin/rpi
 SWAMP=~/.local/bin/swamp
 BRV=/home/node/.openclaw/npm-global/bin/brv
 BUN=/home/node/.openclaw/devbox-env/.devbox/nix/profile/default/bin/bun
-SOULFORGE_WRAPPER=/home/node/.openclaw/workspace/scripts/soulforge-copilot
 FJ_EX=/home/node/.openclaw/bin/fj-ex
-
-export PATH="/home/node/.openclaw/bin:/home/node/.openclaw/npm-global/bin:/home/node/.local/bin:$PATH"
 ```
 
 ## Mandatory Session Start (every worker, every time)
 
 ```bash
-# 1. Decapod session init — do this IN THE WORKTREE, not the main project dir
-cd <WORKTREE_PATH>
+# 1. Decapod session init — run IN THE WORKTREE, not the main project dir
 /home/node/.openclaw/bin/decapod rpc --op agent.init
 # Read allowed_next_ops and blocked_by before proceeding
 
 # 2. ByteRover — check existing patterns before planning
 /home/node/.openclaw/npm-global/bin/brv query "<feature keyword>"
 
-# 3. RPI plan artifact (slash command — only works in Claude Code / OpenCode)
-/rpi-plan
+# 3. RPI plan artifact
+/rpi-plan   # creates .rpi/plans/<date>-<feature>.md
+```
+
+## Golden Rules
+
+1. **Never work on main.** You are always in a worktree on a feature branch.
+2. **Never claim done without `decapod validate` passing.**
+3. **TDD is non-negotiable.** Failing tests committed before implementation. Separate commits.
+4. **Never commit `.db` files.** In-memory DB only for tests.
+5. **Additive only.** Don't modify existing routes — append new ones.
+6. **Error shape is always** `{ error: "..." }`. Match existing messages exactly.
+7. **brv query before planning. brv curate after push.** Always.
+
+## RPI Slash Commands
+
+```
+/rpi-plan        → create implementation plan
+/rpi-implement   → execute plan phase by phase
+/rpi-verify      → validate implementation against plan
+/rpi-diagnose    → root cause analysis on failures
+/rpi-commit      → commit completed work with good message
 ```
 
 ## TDD — Non-Negotiable
@@ -47,7 +66,7 @@ cd <WORKTREE_PATH>
 
 **Test pattern (mandatory):**
 ```ts
-import { describe, it, expect, beforeAll } from "bun:test";
+import { describe, it, expect } from "bun:test";
 import { createApp } from "../src/index";
 
 const app = createApp(":memory:");  // ALWAYS in-memory, never data/tarot.db
@@ -57,7 +76,6 @@ describe("GET /api/cards/...", () => {
     const res = await app.handle(new Request("http://localhost/api/cards/..."));
     const data = await res.json();
     expect(res.status).toBe(200);
-    expect(data).toMatchObject({ ... });
   });
 });
 ```
@@ -66,8 +84,8 @@ describe("GET /api/cards/...", () => {
 
 ## Error Response Shape
 
-Always `{ error: "..." }`. Existing messages:
-- Invalid id → `"Invalid id"` (from validateCardId)
+Always `{ error: "..." }`. Existing messages (match exactly):
+- Invalid id → `"Invalid id"` (from validateCardId — not "Invalid card id")
 - Card not found → `"Card not found"`
 - Invalid suit → `"Invalid suit. Must be one of: wands, cups, swords, pentacles"`
 - Invalid arcana → `"Invalid arcana type. Use 'major' or 'minor'"`
@@ -77,27 +95,20 @@ Always `{ error: "..." }`. Existing messages:
 - Route validation: use `validateCardId(id)` from `../middleware/validate`
 - DB access: `db.query("SELECT * FROM cards WHERE ...").all(param)` — parameterized, no string concat
 - Add new routes AFTER existing card routes in `src/routes/api.ts`
-- Additive only — never modify existing routes
 
-## RPI Artifacts
+## Swamp Behavioral Review
 
-```
-.rpi/plans/         ← implementation plans (created by /rpi-plan)
-.rpi/specs/         ← behavioral specs
-.rpi/reviews/       ← verification reports (/rpi-verify writes here)
-.rpi/diagnoses/     ← bug postmortems (/rpi-diagnose writes here)
+```bash
+~/.local/bin/swamp workflow run tarot-api-behavioral-review --json
+# Runs behavioral checks against the live API. Run after implementing, before pushing.
 ```
 
 ## Decapod Completion Proof
 
 ```bash
 /home/node/.openclaw/bin/decapod validate
-# 4 expected failures (pre-existing):
-# - AGENTS.md line limit (135 > 100)
-# - container workspace isolation (running in /tmp/)
-# - SQLite store access
-# - spec scaffold drift
-# These are governance warnings, not code bugs. Pipeline still passes.
+# 4 expected pre-existing failures (not code bugs, pipeline still passes):
+# - AGENTS.md line limit, container workspace isolation, SQLite store, spec scaffold drift
 ```
 
 ## brv Curate (after push)
@@ -110,4 +121,4 @@ Always `{ error: "..." }`. Existing messages:
 ## Done Signal
 
 Reply: `TASK COMPLETE — <one-line summary>`
-Include: test count, rpi-verify status, decapod validate status
+Include: test count, /rpi-verify status, decapod validate status
