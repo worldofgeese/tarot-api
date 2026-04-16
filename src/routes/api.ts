@@ -407,6 +407,37 @@ export function apiRoutes(db: Database) {
       }));
     })
 
+    .get("/cards/suit/:suit/random", ({ params: { suit }, set }) => {
+      const normalizedSuit = suit.toLowerCase();
+
+      // Validate suit (only allow the four minor arcana suits)
+      const validSuits = ["wands", "cups", "swords", "pentacles"];
+      if (!validSuits.includes(normalizedSuit)) {
+        set.status = 400;
+        return { error: "Invalid suit. Must be one of: wands, cups, swords, pentacles" };
+      }
+
+      // Query random card from the specified suit
+      const query = db.query(`
+        SELECT * FROM cards
+        WHERE suit = ? COLLATE NOCASE
+        ORDER BY RANDOM()
+        LIMIT 1
+      `);
+
+      const card = query.get(suit) as Card | null;
+
+      if (!card) {
+        set.status = 404;
+        return { error: "No cards found for suit" };
+      }
+
+      return {
+        ...card,
+        keywords: parseKeywords(card.keywords)
+      };
+    })
+
     .get("/cards/arcana/:type", ({ params: { type }, set }) => {
       const normalizedType = type.toLowerCase();
 
