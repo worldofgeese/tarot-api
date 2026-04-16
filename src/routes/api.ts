@@ -538,5 +538,113 @@ export function apiRoutes(db: Database) {
         version: "1.0.0",
         card_count: cardCountResult.count,
       };
+    })
+
+    // Readings/Journaling endpoints
+    .post("/readings", ({ body, set }) => {
+      const { spread_type, cards_json, notes } = body as {
+        spread_type?: string;
+        cards_json?: string;
+        notes?: string;
+      };
+
+      // Validate spread_type
+      if (!spread_type) {
+        set.status = 400;
+        return { error: "spread_type is required" };
+      }
+
+      const validSpreadTypes = ["single", "three-card", "celtic-cross", "custom"];
+      if (!validSpreadTypes.includes(spread_type)) {
+        set.status = 400;
+        return { error: "Invalid spread_type. Must be one of: single, three-card, celtic-cross, custom" };
+      }
+
+      // Validate cards_json
+      if (!cards_json) {
+        set.status = 400;
+        return { error: "cards_json is required" };
+      }
+
+      // Validate cards_json is valid JSON array
+      try {
+        const parsed = JSON.parse(cards_json);
+        if (!Array.isArray(parsed)) {
+          set.status = 400;
+          return { error: "cards_json must be a valid JSON array" };
+        }
+      } catch (error) {
+        set.status = 400;
+        return { error: "cards_json must be valid JSON" };
+      }
+
+      // Validate notes length if provided
+      if (notes && notes.length > 2000) {
+        set.status = 400;
+        return { error: "notes must be 2000 characters or less" };
+      }
+
+      // Insert reading
+      const insertQuery = db.prepare(`
+        INSERT INTO readings (spread_type, cards_json, notes)
+        VALUES (?, ?, ?)
+      `);
+
+      const result = insertQuery.run(spread_type, cards_json, notes || null);
+
+      // Fetch the created reading
+      const selectQuery = db.query("SELECT * FROM readings WHERE id = ?");
+      const reading = selectQuery.get(result.lastInsertRowid) as {
+        id: number;
+        spread_type: string;
+        cards_json: string;
+        notes: string | null;
+        created_at: string;
+      };
+
+      set.status = 201;
+      return reading;
+    })
+
+    .get("/readings", ({ query }) => {
+      const { limit = "10", offset = "0" } = query;
+
+      const sql = "SELECT * FROM readings ORDER BY created_at DESC LIMIT ? OFFSET ?";
+      const queryObj = db.query(sql);
+      const readings = queryObj.all(parseInt(limit as string), parseInt(offset as string)) as Array<{
+        id: number;
+        spread_type: string;
+        cards_json: string;
+        notes: string | null;
+        created_at: string;
+      }>;
+
+      return readings;
+    })
+
+    .get("/readings/:id", ({ params: { id }, set }) => {
+      // Validate ID is numeric
+      const validation = validateCardId(id);
+      if (!validation.valid) {
+        set.status = 400;
+        return { error: validation.error };
+      }
+
+      const numericId = parseInt(id, 10);
+      const query = db.query("SELECT * FROM readings WHERE id = ?");
+      const reading = query.get(numericId) as {
+        id: number;
+        spread_type: string;
+        cards_json: string;
+        notes: string | null;
+        created_at: string;
+      } | null;
+
+      if (!reading) {
+        set.status = 404;
+        return { error: "Reading not found" };
+      }
+
+      return reading;
     });
 }

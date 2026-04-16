@@ -51,5 +51,16 @@ export function initDatabase(dbPath: string = "data/tarot.db"): Database {
     END;
   `);
 
+  // Create readings table for journaling
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS readings (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      spread_type TEXT NOT NULL CHECK(spread_type IN ('single','three-card','celtic-cross','custom')),
+      cards_json TEXT NOT NULL,
+      notes TEXT,
+      created_at TEXT NOT NULL DEFAULT (datetime('now'))
+    )
+  `);
+
   return db;
 }
