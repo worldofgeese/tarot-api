@@ -779,5 +779,20 @@ export function apiRoutes(db: Database) {
       };
 
       return reading;
+    })
+    .delete("/readings/:id", ({ params: { id }, set }) => {
+      const numericId = parseInt(id);
+      if (isNaN(numericId) || numericId < 0) {
+        set.status = 400;
+        return { error: "Invalid id" };
+      }
+      const check = db.query("SELECT id FROM readings WHERE id = ?").get(numericId);
+      if (!check) {
+        set.status = 404;
+        return { error: "Reading not found" };
+      }
+      db.prepare("DELETE FROM readings WHERE id = ?").run(numericId);
+      set.status = 204;
+      return null;
     });
 }
