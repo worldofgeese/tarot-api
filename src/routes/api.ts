@@ -462,6 +462,25 @@ export function apiRoutes(db: Database) {
       }));
     })
 
+    .get("/cards/numerology/:number", ({ params: { number }, set }) => {
+      const num = parseInt(number);
+
+      // Validate: must be an integer and non-negative
+      if (isNaN(num) || num < 0) {
+        set.status = 400;
+        return { error: "Invalid number parameter. Must be a non-negative integer" };
+      }
+
+      // Query cards by number field
+      const query = db.query("SELECT * FROM cards WHERE number = ?");
+      const cards = query.all(num) as Card[];
+
+      return cards.map(card => ({
+        ...card,
+        keywords: parseKeywords(card.keywords)
+      }));
+    })
+
     .get("/spreads", () => {
       return listSpreads();
     })

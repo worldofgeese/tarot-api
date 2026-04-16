@@ -7,8 +7,8 @@ describe("GET /api/cards/numerology/:number", () => {
 
   beforeAll(async () => {
     const { default: createApp } = await import("../src/index");
-    // Use in-memory DB for tests (no side effects, no file on disk)
-    app = createApp(":memory:");
+    // Use real DB with seeded data for tests
+    app = createApp();
     baseUrl = "http://localhost:3003";
     app.listen(3003);
   });
