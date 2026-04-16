@@ -723,9 +723,15 @@ export function apiRoutes(db: Database) {
       }
 
       // Validate notes length if provided
-      if (notes !== undefined && notes.length > 2000) {
-        set.status = 400;
-        return { error: "notes must be 2000 characters or less" };
+      if (notes !== undefined) {
+        if (typeof notes !== "string") {
+          set.status = 400;
+          return { error: "notes must be a string" };
+        }
+        if (notes.length > 2000) {
+          set.status = 400;
+          return { error: "notes must be 2000 characters or less" };
+        }
       }
 
       const numericId = parseInt(id, 10);
