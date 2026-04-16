@@ -27,7 +27,7 @@ The `cards` table has a `reversed_meaning` column (TEXT NOT NULL) that stores th
 ### Error Responses
 - **400 Bad Request**: Invalid card ID (non-integer)
   ```json
-  { "error": "Invalid card id" }
+  { "error": "Invalid id" }
   ```
 - **404 Not Found**: Card not found
   ```json
@@ -46,7 +46,7 @@ Following existing patterns from `/api/cards/:id` and `/api/meaning/:id`:
 - [ ] **RED Phase**: Write failing tests in `tests/reversals.test.ts`
   - [ ] Test: `GET /api/cards/0/reversal` → 200 with reversed meaning
   - [ ] Test: `GET /api/cards/999/reversal` → 404 "Card not found"
-  - [ ] Test: `GET /api/cards/abc/reversal` → 400 "Invalid card id"
+  - [ ] Test: `GET /api/cards/abc/reversal` → 400 "Invalid id"
   - [ ] Run tests, confirm failures
   - [ ] Commit: "test: failing tests for card reversals endpoint (RED)"
 
@@ -69,5 +69,5 @@ Following existing patterns from `/api/cards/:id` and `/api/meaning/:id`:
 
 ## Notes
 - Use in-memory DB pattern from `tests/numerology.test.ts` but adjusted for real DB
-- Match error message format exactly: "Invalid card id" and "Card not found"
+- Match error message format exactly: "Invalid id" and "Card not found"
 - Response shape is simplified compared to full card object (only id, name, reversed)
