@@ -1,6 +1,15 @@
 ---
 name: swamp-extension-driver
-description: Create user-defined TypeScript execution drivers for swamp — implement ExecutionDriver to control where and how model methods run. Use when users want custom execution environments (remote servers, cloud functions, custom containers). Triggers on "custom driver", "extension driver", "execution driver", "ExecutionDriver", "extensions/drivers", "create driver", "new driver type", "driver plugin", "remote execution", "driver implementation".
+description: >
+  Create user-defined TypeScript execution drivers for swamp — implement the
+  ExecutionDriver interface to control where and how model methods run. Use
+  ONLY when the user wants to author, build, or implement a new driver in
+  extensions/drivers/. Do NOT use for running workflows on remote
+  infrastructure (that is swamp-workflow), running existing models (that is
+  swamp-model), or debugging driver issues (that is swamp-troubleshooting).
+  Triggers on "custom driver", "extension driver", "execution driver",
+  "ExecutionDriver", "extensions/drivers", "create driver", "new driver type",
+  "driver plugin", "driver implementation", "implement ExecutionDriver".
 ---
 
 # Swamp Extension Driver
@@ -233,18 +242,10 @@ findings to the user before proceeding.
 
 ## Publishing
 
-Publishing is the same for all extension types. Before pushing:
-
-1. **Get next version**:
-   `swamp extension version --manifest manifest.yaml --json`
-2. **Bump version** in `manifest.yaml` — use the `nextVersion` from above
-3. **Format & lint**: `swamp extension fmt manifest.yaml`
-4. **Dry-run**: `swamp extension push manifest.yaml --dry-run --json`
-5. **Push**: `swamp extension push manifest.yaml --yes --json`
-
-For the full manifest schema, CalVer versioning, safety rules, and
-troubleshooting, see the
-[publishing guide](../swamp-extension-model/references/publishing.md).
+Use the `swamp-extension-publish` skill to publish extensions to the registry.
+It provides a state-machine checklist that enforces all prerequisites
+(repository initialization, authentication, manifest validation, collective
+verification) before allowing a push.
 
 ## References
 

@@ -1,6 +1,16 @@
 ---
 name: swamp-report
-description: Create, register, configure, and run reports for swamp models and workflows. Use when creating report extensions, configuring reports in definition YAML, running reports via CLI, or viewing report output. Triggers on "report", "swamp report", "model report", "create report", "run report", "report extension", "report label", "skip report", "report output", "cost report", "audit report", "workflow report", "report results".
+description: >
+  Create, register, configure, and run reports for swamp models and workflows.
+  Use when creating report extensions, configuring reports in definition YAML,
+  running reports via CLI, viewing report output, or accessing execution data
+  through the report API (dataRepository, UnifiedDataRepository, dataHandles,
+  MethodReportContext). Do NOT use for debugging report execution failures —
+  that is swamp-troubleshooting. Triggers on "report", "swamp report", "model
+  report", "create report", "run report", "report extension", "report label",
+  "skip report", "report output", "cost report", "audit report", "workflow
+  report", "report results", "dataRepository", "UnifiedDataRepository",
+  "dataHandles", "report context", "report data access".
 ---
 
 # Swamp Report Skill
@@ -273,8 +283,9 @@ reports:
   - compliance_report.ts
 ```
 
-For the full publishing workflow, CalVer versioning, and safety rules, see the
-[publishing guide](../swamp-extension-model/references/publishing.md).
+For the full publishing workflow, use the `swamp-extension-publish` skill. It
+provides a state-machine checklist that enforces all prerequisites before
+allowing a push.
 
 ## CLI Flags
 

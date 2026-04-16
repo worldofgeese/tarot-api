@@ -28,8 +28,8 @@ node_modules/
 # Local extension sources (developer-specific, not shared)
 .swamp-sources.yaml
 
-# Claude Code configuration (managed by swamp)
-.claude/
+# Agent skills (managed by swamp)
+.agents/skills/
 # END swamp managed section
 
 # Override: track Claude Code commands and skills (OpenSpec + Swamp agent skills)
