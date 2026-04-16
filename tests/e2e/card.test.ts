@@ -1,5 +1,7 @@
 import { test, expect } from "bun:test";
-import { runSession } from "./cli";
+import { runSession, registerCleanup } from "./cli";
+
+registerCleanup();
 
 test("card detail page shows The Fool for id 0", () => {
   const { snapshot } = runSession("http://localhost:3000/card/0");

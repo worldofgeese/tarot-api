@@ -1,5 +1,7 @@
 import { test, expect } from "bun:test";
-import { runSession, runSessionWithClick, countInSnapshot } from "./cli";
+import { runSession, runSessionWithClick, countInSnapshot, registerCleanup } from "./cli";
+
+registerCleanup();
 
 test("landing page has correct title", () => {
   const { title } = runSession("http://localhost:3000");

@@ -1,5 +1,7 @@
 import { test, expect } from "bun:test";
-import { runSession, runSessionWithClick } from "./cli";
+import { runSession, runSessionWithClick, registerCleanup } from "./cli";
+
+registerCleanup();
 
 test("spread page loads", () => {
   const { snapshot } = runSession("http://localhost:3000/spread");
