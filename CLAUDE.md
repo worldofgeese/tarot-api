@@ -66,8 +66,8 @@ FJ_EX=/home/node/.openclaw/bin/fj-ex
 
 **Test pattern (mandatory):**
 ```ts
-import { describe, it, expect } from "bun:test";
-import { createApp } from "../src/index";
+import { describe, it, expect, beforeAll } from "bun:test";
+import createApp from "../src/index";  // default export — NOT { createApp }
 
 const app = createApp(":memory:");  // ALWAYS in-memory, never data/tarot.db
 
