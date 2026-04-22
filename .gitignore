@@ -53,3 +53,5 @@ data/tarot.db
 # Gate evidence (auto-generated, don't track)
 gate-evidence/
 *.db
+.claude/
+.sdlc/

@@ -86,6 +86,16 @@ export function validateCardId(id: string): { valid: boolean; error?: string } {
     return { valid: false, error: "Invalid id" };
   }
 
+  // Reject values larger than MAX_SAFE_INTEGER
+  if (numericId > Number.MAX_SAFE_INTEGER) {
+    return { valid: false, error: "Invalid id" };
+  }
+
+  // Reject leading zeros (except for "0" itself)
+  if (id !== "0" && id.startsWith("0")) {
+    return { valid: false, error: "Invalid id" };
+  }
+
   return { valid: true };
 }
 
