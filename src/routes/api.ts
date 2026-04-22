@@ -393,6 +393,9 @@ export function apiRoutes(db: Database) {
         // Use the provided date
         const { card, date, reversed } = getDailyCard(db, parsedDate);
 
+        // Save to daily_history (INSERT OR IGNORE to avoid duplicates)
+        db.query("INSERT OR IGNORE INTO daily_history (date, card_id) VALUES (?, ?)").run(date, card.id);
+
         return {
           ...card,
           keywords: parseKeywords(card.keywords),
@@ -403,6 +406,9 @@ export function apiRoutes(db: Database) {
 
       // No date parameter, use today's date
       const { card, date, reversed } = getDailyCard(db);
+
+      // Save to daily_history (INSERT OR IGNORE to avoid duplicates)
+      db.query("INSERT OR IGNORE INTO daily_history (date, card_id) VALUES (?, ?)").run(date, card.id);
 
       return {
         ...card,
@@ -509,6 +515,97 @@ export function apiRoutes(db: Database) {
         ...card,
         keywords: parseKeywords(card.keywords)
       }));
+    })
+
+    .get("/cards/combine/:id1/:id2", ({ params: { id1, id2 }, set }) => {
+      // Validate both card IDs
+      const validation1 = validateCardId(id1);
+      if (!validation1.valid) {
+        set.status = 400;
+        return { error: validation1.error };
+      }
+
+      const validation2 = validateCardId(id2);
+      if (!validation2.valid) {
+        set.status = 400;
+        return { error: validation2.error };
+      }
+
+      // Check if both IDs are the same
+      if (id1 === id2) {
+        set.status = 400;
+        return { error: "Cards must be different" };
+      }
+
+      // Fetch both cards
+      const numericId1 = parseInt(id1);
+      const numericId2 = parseInt(id2);
+
+      const query = db.query("SELECT * FROM cards WHERE id = ?");
+      const card1 = query.get(numericId1) as Card | null;
+      const card2 = query.get(numericId2) as Card | null;
+
+      if (!card1 || !card2) {
+        set.status = 404;
+        return { error: "Card not found" };
+      }
+
+      // Helper function to get element from suit
+      const getElement = (suit: string | null): string | null => {
+        if (!suit) return null; // Major Arcana has no element
+        const suitLower = suit.toLowerCase();
+        const elementMap: Record<string, string> = {
+          wands: "fire",
+          cups: "water",
+          swords: "air",
+          pentacles: "earth"
+        };
+        return elementMap[suitLower] || null;
+      };
+
+      // Determine relationship
+      const element1 = getElement(card1.suit);
+      const element2 = getElement(card2.suit);
+
+      let relationship: "harmonious" | "tension" | "neutral";
+
+      // If either card is Major Arcana (no element), relationship is neutral
+      if (element1 === null || element2 === null) {
+        relationship = "neutral";
+      } else if (element1 === element2) {
+        // Same element = harmonious
+        relationship = "harmonious";
+      } else {
+        // Check for opposing elements
+        const opposingPairs = [
+          ["fire", "water"],
+          ["water", "fire"],
+          ["air", "earth"],
+          ["earth", "air"]
+        ];
+        const isOpposing = opposingPairs.some(
+          ([e1, e2]) => element1 === e1 && element2 === e2
+        );
+        relationship = isOpposing ? "tension" : "neutral";
+      }
+
+      // Combine and deduplicate keywords
+      const keywords1 = parseKeywords(card1.keywords);
+      const keywords2 = parseKeywords(card2.keywords);
+      const combined_keywords = [...new Set([...keywords1, ...keywords2])];
+
+      return {
+        card1: {
+          ...card1,
+          keywords: keywords1
+        },
+        card2: {
+          ...card2,
+          keywords: keywords2
+        },
+        relationship,
+        combined_keywords
+      };
     })
 
     .get("/cards/numerology/:number", ({ params: { number }, set }) => {
@@ -820,5 +917,80 @@ export function apiRoutes(db: Database) {
       db.prepare("DELETE FROM readings WHERE id = ?").run(numericId);
       set.status = 204;
       return null;
+    })
+
+    .get("/readings/stats", () => {
+      // Get total readings count
+      const totalReadingsQuery = db.query("SELECT COUNT(*) as count FROM readings");
+      const totalReadingsResult = totalReadingsQuery.get() as { count: number };
+      const totalReadings = totalReadingsResult.count;
+
+      // Get spread breakdown (GROUP BY spread_type)
+      const spreadBreakdownQuery = db.query(`
+        SELECT spread_type, COUNT(*) as count
+        FROM readings
+        GROUP BY spread_type
+      `);
+      const spreadBreakdownResult = spreadBreakdownQuery.all() as Array<{ spread_type: string; count: number }>;
+      const spreadBreakdown: Record<string, number> = {};
+      for (const row of spreadBreakdownResult) {
+        spreadBreakdown[row.spread_type] = row.count;
+      }
+
+      // Get most drawn cards (parse cards_json, count occurrences, top 5)
+      const allReadingsQuery = db.query("SELECT cards_json FROM readings");
+      const allReadings = allReadingsQuery.all() as Array<{ cards_json: string }>;
+
+      const cardCounts = new Map<number, number>();
+      for (const reading of allReadings) {
+        try {
+          const cardIds = JSON.parse(reading.cards_json) as number[];
+          for (const cardId of cardIds) {
+            cardCounts.set(cardId, (cardCounts.get(cardId) || 0) + 1);
+          }
+        } catch (error) {
+          // Skip invalid JSON
+          continue;
+        }
+      }
+
+      // Sort by count descending and take top 5
+      const sortedCards = Array.from(cardCounts.entries())
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 5);
+
+      // Fetch card names for the top cards
+      const mostDrawnCards: Array<{ cardId: number; name: string; count: number }> = [];
+      for (const [cardId, count] of sortedCards) {
+        const cardQuery = db.query("SELECT id, name FROM cards WHERE id = ?");
+        const card = cardQuery.get(cardId) as { id: number; name: string } | null;
+        if (card) {
+          mostDrawnCards.push({
+            cardId: card.id,
+            name: card.name,
+            count
+          });
+        }
+      }
+
+      // Get recent readings (last 7 days)
+      const sevenDaysAgo = new Date();
+      sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+      const sevenDaysAgoISO = sevenDaysAgo.toISOString();
+
+      const recentReadingsQuery = db.query(`
+        SELECT COUNT(*) as count
+        FROM readings
+        WHERE created_at >= ?
+      `);
+      const recentReadingsResult = recentReadingsQuery.get(sevenDaysAgoISO) as { count: number };
+      const recentReadings = recentReadingsResult.count;
+
+      return {
+        totalReadings,
+        spreadBreakdown,
+        mostDrawnCards,
+        recentReadings
+      };
     });
 }
