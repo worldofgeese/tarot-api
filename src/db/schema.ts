@@ -63,6 +63,27 @@ export function initDatabase(dbPath: string = "data/tarot.db"): Database {
     )
   `);
 
+  // Create daily_history table to track past daily cards
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS daily_history (
+      date TEXT PRIMARY KEY,
+      card_id INTEGER NOT NULL,
+      created_at TEXT NOT NULL DEFAULT (datetime('now')),
+      FOREIGN KEY (card_id) REFERENCES cards(id)
+    )
+  `);
+
+  // Create favorites table for bookmarked cards
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS favorites (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      card_id INTEGER NOT NULL,
+      note TEXT DEFAULT '',
+      created_at TEXT NOT NULL DEFAULT (datetime('now')),
+      FOREIGN KEY (card_id) REFERENCES cards(id)
+    )
+  `);
+
   // Seed data if database is empty (e.g., :memory: or new database)
   const count = db.query("SELECT COUNT(*) as count FROM cards").get() as { count: number };
   if (count.count === 0) {
