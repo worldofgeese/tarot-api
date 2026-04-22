@@ -1,0 +1,18 @@
+=== Manual Exercise: DELETE /api/readings/:id ===
+Date: Thu Apr 16 10:55:28 UTC 2026
+
+Created reading ID: 4
+
+--- DELETE /api/readings/4 → 204 ---
+HTTP 204
+--- GET /api/readings/4 after delete → 404 ---
+{"error":"Reading not found"}
+HTTP 404
+--- DELETE /api/readings/9999 → 404 ---
+{"error":"Reading not found"}
+HTTP 404
+--- DELETE /api/readings/abc → 400 ---
+{"error":"Invalid id"}
+HTTP 400
+--- Health check ---
+OK, cards: 0

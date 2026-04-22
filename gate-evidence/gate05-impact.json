@@ -1,0 +1,2 @@
+session: auto-acquired for agent 'unknown'.
+Error: ValidationError("SCOPE_VIOLATION: non-canonical worktree path '/tmp/tarot-run5'. Decapod-managed work must run from '.decapod/workspaces/*'. Run `decapod workspace ensure --branch agent/<id>/<topic>` and execute from the returned path.")

@@ -50,8 +50,9 @@ scripts/__pycache__/
 prompts/
 data/tarot.db
 
-# Gate evidence (auto-generated, don't track)
-gate-evidence/
-*.db
-.claude/
-.sdlc/
+# SDLC orchestrator pipeline (tracked)
+!.claude/
+!.claude/**
+!.sdlc/
+!.sdlc/**
+!gate-evidence/.gitkeep

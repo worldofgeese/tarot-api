@@ -1,0 +1,3 @@
+{
+  "message": "No audit data found. Run 'swamp repo init --force' to enable the audit hook."
+}

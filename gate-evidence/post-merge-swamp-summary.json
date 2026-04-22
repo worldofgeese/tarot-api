@@ -1,0 +1,58 @@
+{
+  "since": "2026-04-09T11:14:48.687Z",
+  "methodExecutions": [
+    {
+      "modelName": "tarot-api-health-check",
+      "type": "command/shell",
+      "succeeded": 60,
+      "failed": 10,
+      "total": 70,
+      "methods": [
+        {
+          "method": "execute",
+          "succeeded": 60,
+          "failed": 10,
+          "total": 70,
+          "runs": [
+            {
+              "id": "e9c87a3c-e9af-4f03-b527-e3d21118b79a",
+              "definitionId": "4afa31cf-eb5b-449c-a4e2-d4bbc8f960eb",
+              "startedAt": "2026-04-16T11:12:57.032Z",
+              "durationMs": 91,
+              "status": "succeeded",
+              "triggeredBy": "workflow"
+            },
+            {
+              "id": "7cfea3d1-1f04-4269-93ae-943f68a374a6",
+              "definitionId": "4afa31cf-eb5b-449c-a4e2-d4bbc8f960eb",
+              "startedAt": "2026-04-16T11:12:57.031Z",
+              "durationMs": 113,
+              "status": "succeeded",
+              "triggeredBy": "workflow"
+            },
+            {
+              "id": "8ebb68f9-c8da-4859-9c7b-d7f30804259c",
+              "definitionId": "4afa31cf-eb5b-449c-a4e2-d4bbc8f960eb",
+              "startedAt": "2026-04-16T11:12:57.030Z",
+              "durationMs": 130,
+              "status": "succeeded",
+              "triggeredBy": "workflow"
+            },
+            {
+              "id": "50d701e4-0868-44c7-ae30-6347c8c4b871",
+              "definitionId": "4afa31cf-eb5b-449c-a4e2-d4bbc8f960eb",
+              "startedAt": "2026-04-16T11:12:57.010Z",
+              "durationMs": 104,
+              "status": "succeeded",
+              "triggeredBy": "workflow"
+            },
+            {
+              "id": "dd1e114c-bdc4-4011-9fc2-859a6fa37ff0",
+              "definitionId": "4afa31cf-eb5b-449c-a4e2-d4bbc8f960eb",
+              "startedAt": "2026-04-16T11:07:37.352Z",
+              "durationMs": 58,
+              "status": "succeeded",
+              "triggeredBy": "workflow"
+            },
+            {
+     

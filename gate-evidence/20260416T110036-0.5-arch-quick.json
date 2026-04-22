@@ -1,0 +1,9 @@
+{
+  "gate": "0.5-arch-quick",
+  "passed": true,
+  "duration_ms": 22488,
+  "evidence": "/home/node/.openclaw/workspace/projects/tarot-api/gate-evidence/gate05-result.txt",
+  "model": "claude-sonnet-4",
+  "detail": "**APPROVE**",
+  "ts": "2026-04-16T11:01:43+00:00"
+}

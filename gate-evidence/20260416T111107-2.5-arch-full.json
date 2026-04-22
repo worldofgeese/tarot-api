@@ -1,0 +1,9 @@
+{
+  "gate": "2.5-arch-full",
+  "passed": true,
+  "duration_ms": 40498,
+  "evidence": "/home/node/.openclaw/workspace/projects/tarot-api/gate-evidence/gate25-result.txt",
+  "model": "claude-sonnet-4",
+  "detail": "The implementation demonstrates excellent verification and pipeline integrity. Tests comprehensively",
+  "ts": "2026-04-16T11:14:27+00:00"
+}

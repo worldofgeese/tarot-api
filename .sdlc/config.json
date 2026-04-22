@@ -1,0 +1,84 @@
+{
+  "version": "1.0.0",
+  "project": {
+    "name": "tarot-api",
+    "defaultBranch": "main",
+    "tools": {
+      "soulforge": false,
+      "decapod": true,
+      "swamp": true,
+      "cook": true,
+      "byterover": false,
+      "fjex": false,
+      "playwright": false
+    }
+  },
+  "models": {
+    "worker": "github-copilot/claude-opus-4-7",
+    "reviewer": "github-copilot/claude-opus-4-7",
+    "judge": "github-copilot/claude-opus-4-7",
+    "council": [
+      "github-copilot/claude-opus-4-7",
+      "openai-codex/gpt-5.4",
+      "opencode-go/glm-5.1",
+      "openrouter/openrouter/free"
+    ]
+  },
+  "gates": {
+    "architecture": {
+      "enabled": true,
+      "soulforge": false,
+      "decapodPreflight": false
+    },
+    "structural": {
+      "enabled": true,
+      "decapodValidate": false,
+      "autoDetect": true
+    },
+    "behavioral": {
+      "enabled": true,
+      "swampRequired": true
+    },
+    "judge": {
+      "enabled": true,
+      "samples": 3,
+      "thresholds": {
+        "low": 80,
+        "medium": 60
+      }
+    },
+    "verification": {
+      "enabled": true,
+      "soulforgeChallenge": false
+    },
+    "ci": {
+      "enabled": false,
+      "autoRetry": 3,
+      "fjexFull": false
+    },
+    "council": {
+      "enabled": true,
+      "lineThreshold": 150,
+      "fileThreshold": 3,
+      "securityKeywords": true
+    }
+  },
+  "evidence": {
+    "backend": "swamp",
+    "queryable": true,
+    "storeReports": true
+  },
+  "cook": {
+    "defaultPattern": "review",
+    "maxIterations": 3,
+    "perStepModels": {
+      "work": "github-copilot/claude-sonnet-4.6",
+      "review": "github-copilot/claude-opus-4-7"
+    }
+  },
+  "hooks": {
+    "sessionStart": true,
+    "preCommit": true,
+    "postMerge": true
+  }
+}
