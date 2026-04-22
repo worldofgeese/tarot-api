@@ -820,5 +820,123 @@ export function apiRoutes(db: Database) {
       db.prepare("DELETE FROM readings WHERE id = ?").run(numericId);
       set.status = 204;
       return null;
+    })
+
+    // Favorites endpoints
+    .post("/favorites", ({ body, set }) => {
+      const { cardId, note } = body as { cardId?: number; note?: string };
+
+      // Validate cardId exists
+      if (cardId === undefined || cardId === null) {
+        set.status = 400;
+        return { error: "cardId is required" };
+      }
+
+      // Check if card exists
+      const card = db.query("SELECT * FROM cards WHERE id = ?").get(cardId) as Card | null;
+      if (!card) {
+        set.status = 404;
+        return { error: "Card not found" };
+      }
+
+      // Insert favorite
+      const insertQuery = db.prepare("INSERT INTO favorites (card_id, note) VALUES (?, ?)");
+      const result = insertQuery.run(cardId, note || "");
+
+      // Fetch created favorite
+      const favorite = db.query("SELECT * FROM favorites WHERE id = ?").get(result.lastInsertRowid) as {
+        id: number;
+        card_id: number;
+        note: string;
+        created_at: string;
+      };
+
+      set.status = 201;
+      return {
+        ...favorite,
+        card: {
+          ...card,
+          keywords: parseKeywords(card.keywords)
+        }
+      };
+    })
+
+    .get("/favorites", ({ query }) => {
+      const { limit = "20", offset = "0", sort = "newest" } = query;
+
+      const limitNum = parseInt(limit as string);
+      const offsetNum = parseInt(offset as string);
+
+      // Determine sort order
+      const orderBy = sort === "oldest" ? "ASC" : "DESC";
+
+      // Query favorites with card data
+      const sql = `
+        SELECT f.*, c.*
+        FROM favorites f
+        JOIN cards c ON f.card_id = c.id
+        ORDER BY f.created_at ${orderBy}
+        LIMIT ? OFFSET ?
+      `;
+
+      const rows = db.query(sql).all(limitNum, offsetNum) as Array<{
+        id: number;
+        card_id: number;
+        note: string;
+        created_at: string;
+        name: string;
+        arcana: string;
+        suit: string | null;
+        number: number | null;
+        upright_meaning: string;
+        reversed_meaning: string;
+        keywords: string;
+        image_desc: string;
+      }>;
+
+      // Get total count
+      const countResult = db.query("SELECT COUNT(*) as count FROM favorites").get() as { count: number };
+
+      // Format response
+      const favorites = rows.map(row => ({
+        id: row.id,
+        card_id: row.card_id,
+        note: row.note,
+        created_at: row.created_at,
+        card: {
+          id: row.card_id,
+          name: row.name,
+          arcana: row.arcana,
+          suit: row.suit,
+          number: row.number,
+          upright_meaning: row.upright_meaning,
+          reversed_meaning: row.reversed_meaning,
+          keywords: parseKeywords(row.keywords),
+          image_desc: row.image_desc
+        }
+      }));
+
+      return {
+        favorites,
+        total: countResult.count
+      };
+    })
+
+    .delete("/favorites/:id", ({ params: { id }, set }) => {
+      const numericId = parseInt(id);
+      if (isNaN(numericId) || numericId < 0) {
+        set.status = 400;
+        return { error: "Invalid id" };
+      }
+
+      const check = db.query("SELECT id FROM favorites WHERE id = ?").get(numericId);
+      if (!check) {
+        set.status = 404;
+        return { error: "Favorite not found" };
+      }
+
+      db.prepare("DELETE FROM favorites WHERE id = ?").run(numericId);
+      set.status = 204;
+      return null;
     });
 }
