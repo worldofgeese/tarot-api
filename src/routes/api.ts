@@ -259,6 +259,118 @@ export function apiRoutes(db: Database) {
       };
     })
 
+    .get("/cards/compare/:id1/:id2", ({ params: { id1, id2 }, set }) => {
+      // Validate both card IDs
+      const validation1 = validateCardId(id1);
+      if (!validation1.valid) {
+        set.status = 400;
+        return { error: validation1.error };
+      }
+
+      const validation2 = validateCardId(id2);
+      if (!validation2.valid) {
+        set.status = 400;
+        return { error: validation2.error };
+      }
+
+      const numericId1 = parseInt(id1);
+      const numericId2 = parseInt(id2);
+
+      // Fetch both cards
+      const query = db.query("SELECT * FROM cards WHERE id = ?");
+      const card1 = query.get(numericId1) as Card | null;
+      const card2 = query.get(numericId2) as Card | null;
+
+      if (!card1 || !card2) {
+        set.status = 404;
+        return { error: "Card not found" };
+      }
+
+      // Parse keywords
+      const keywords1 = parseKeywords(card1.keywords);
+      const keywords2 = parseKeywords(card2.keywords);
+
+      // Normalize keywords to lowercase for comparison
+      const keywords1Lower = keywords1.map(k => k.toLowerCase());
+      const keywords2Lower = keywords2.map(k => k.toLowerCase());
+
+      // Find shared keywords (case-insensitive)
+      const sharedKeywords: string[] = [];
+      const keywords1Set = new Set(keywords1Lower);
+      const keywords2Set = new Set(keywords2Lower);
+
+      keywords1.forEach((keyword, index) => {
+        const lowerKeyword = keywords1Lower[index];
+        if (keywords2Set.has(lowerKeyword)) {
+          sharedKeywords.push(keyword);
+        }
+      });
+
+      // Find unique keywords
+      const uniqueToCard1: string[] = [];
+      keywords1.forEach((keyword, index) => {
+        const lowerKeyword = keywords1Lower[index];
+        if (!keywords2Set.has(lowerKeyword)) {
+          uniqueToCard1.push(keyword);
+        }
+      });
+
+      const uniqueToCard2: string[] = [];
+      keywords2.forEach((keyword, index) => {
+        const lowerKeyword = keywords2Lower[index];
+        if (!keywords1Set.has(lowerKeyword)) {
+          uniqueToCard2.push(keyword);
+        }
+      });
+
+      // Determine arcana type (Major Arcana has null/empty suit)
+      const isMajor1 = !card1.suit || card1.suit === "";
+      const isMajor2 = !card2.suit || card2.suit === "";
+      const sameArcana = isMajor1 === isMajor2;
+
+      // Compare suits (null suits for Major Arcana count as same)
+      const sameSuit = card1.suit === card2.suit;
+
+      // Map suits to elements
+      const elementMap: Record<string, string> = {
+        wands: "fire",
+        cups: "water",
+        swords: "air",
+        pentacles: "earth"
+      };
+
+      const element1 = card1.suit ? elementMap[card1.suit.toLowerCase()] : null;
+      const element2 = card2.suit ? elementMap[card2.suit.toLowerCase()] : null;
+      const sameElement = element1 === element2;
+
+      // Calculate number difference (null if one is Major and one is Minor)
+      let numberDifference: number | null = null;
+      if (isMajor1 === isMajor2) {
+        // Both same type (both Major or both Minor) - calculate difference
+        numberDifference = Math.abs(card1.number - card2.number);
+      }
+
+      return {
+        card1: {
+          ...card1,
+          keywords: keywords1
+        },
+        card2: {
+          ...card2,
+          keywords: keywords2
+        },
+        comparison: {
+          sameArcana,
+          sameSuit,
+          sameElement,
+          numberDifference,
+          sharedKeywords,
+          uniqueToCard1,
+          uniqueToCard2
+        }
+      };
+    })
+
     .get("/spread/:type", ({ params: { type }, query, set }) => {
       try {
         // Special handling for "single" type with count parameter
