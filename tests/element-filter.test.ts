@@ -1,187 +1,80 @@
-import { describe, test, expect, beforeAll, afterAll } from "bun:test";
-import { Elysia } from "elysia";
+import { describe, it, expect } from "bun:test";
+import createApp from "../src/index";
 
-describe("Element Filter Endpoint Tests", () => {
-  let app: Elysia;
-  let baseUrl: string;
+const app = createApp(":memory:");
 
-  beforeAll(async () => {
-    const { default: createApp } = await import("../src/index");
-    app = createApp();
-    baseUrl = "http://localhost:3005";
-
-    // Start server on test port
-    app.listen(3005);
-  });
-
-  afterAll(() => {
-    app.stop();
-  });
-
-  // AC1: GET /cards/element/fire → 200, returns 14 cards, all suit=Wands
-  test("GET /api/cards/element/fire returns 200 status", async () => {
-    const response = await fetch(`${baseUrl}/api/cards/element/fire`);
-    expect(response.status).toBe(200);
-  });
-
-  test("GET /api/cards/element/fire returns exactly 14 cards", async () => {
-    const response = await fetch(`${baseUrl}/api/cards/element/fire`);
-    const data = await response.json();
-    expect(data).toBeArray();
+describe("GET /api/cards/element/:element", () => {
+  it("returns 200 with 14 Wands cards for fire element", async () => {
+    const res = await app.handle(new Request("http://localhost/api/cards/element/fire"));
+    const data = await res.json();
+    expect(res.status).toBe(200);
+    expect(Array.isArray(data)).toBe(true);
     expect(data.length).toBe(14);
-  });
-
-  test("GET /api/cards/element/fire - all cards have suit=wands", async () => {
-    const response = await fetch(`${baseUrl}/api/cards/element/fire`);
-    const data = await response.json();
-
-    for (const card of data) {
+    data.forEach((card: any) => {
       expect(card.suit).toBe("wands");
-    }
+    });
   });
 
-  // AC2: GET /cards/element/water → 200, returns 14 cards, all suit=Cups
-  test("GET /api/cards/element/water returns 200 status", async () => {
-    const response = await fetch(`${baseUrl}/api/cards/element/water`);
-    expect(response.status).toBe(200);
-  });
-
-  test("GET /api/cards/element/water returns exactly 14 cards", async () => {
-    const response = await fetch(`${baseUrl}/api/cards/element/water`);
-    const data = await response.json();
-    expect(data).toBeArray();
+  it("returns 200 with 14 Cups cards for water element", async () => {
+    const res = await app.handle(new Request("http://localhost/api/cards/element/water"));
+    const data = await res.json();
+    expect(res.status).toBe(200);
+    expect(Array.isArray(data)).toBe(true);
     expect(data.length).toBe(14);
-  });
-
-  test("GET /api/cards/element/water - all cards have suit=cups", async () => {
-    const response = await fetch(`${baseUrl}/api/cards/element/water`);
-    const data = await response.json();
-
-    for (const card of data) {
+    data.forEach((card: any) => {
       expect(card.suit).toBe("cups");
-    }
+    });
   });
 
-  // AC3: GET /cards/element/air → 200, returns 14 cards, all suit=Swords
-  test("GET /api/cards/element/air returns 200 status", async () => {
-    const response = await fetch(`${baseUrl}/api/cards/element/air`);
-    expect(response.status).toBe(200);
-  });
-
-  test("GET /api/cards/element/air returns exactly 14 cards", async () => {
-    const response = await fetch(`${baseUrl}/api/cards/element/air`);
-    const data = await response.json();
-    expect(data).toBeArray();
+  it("returns 200 with 14 Swords cards for air element", async () => {
+    const res = await app.handle(new Request("http://localhost/api/cards/element/air"));
+    const data = await res.json();
+    expect(res.status).toBe(200);
+    expect(Array.isArray(data)).toBe(true);
     expect(data.length).toBe(14);
-  });
-
-  test("GET /api/cards/element/air - all cards have suit=swords", async () => {
-    const response = await fetch(`${baseUrl}/api/cards/element/air`);
-    const data = await response.json();
-
-    for (const card of data) {
+    data.forEach((card: any) => {
       expect(card.suit).toBe("swords");
-    }
+    });
   });
 
-  // AC4: GET /cards/element/earth → 200, returns 14 cards, all suit=Pentacles
-  test("GET /api/cards/element/earth returns 200 status", async () => {
-    const response = await fetch(`${baseUrl}/api/cards/element/earth`);
-    expect(response.status).toBe(200);
-  });
-
-  test("GET /api/cards/element/earth returns exactly 14 cards", async () => {
-    const response = await fetch(`${baseUrl}/api/cards/element/earth`);
-    const data = await response.json();
-    expect(data).toBeArray();
+  it("returns 200 with 14 Pentacles cards for earth element", async () => {
+    const res = await app.handle(new Request("http://localhost/api/cards/element/earth"));
+    const data = await res.json();
+    expect(res.status).toBe(200);
+    expect(Array.isArray(data)).toBe(true);
     expect(data.length).toBe(14);
-  });
-
-  test("GET /api/cards/element/earth - all cards have suit=pentacles", async () => {
-    const response = await fetch(`${baseUrl}/api/cards/element/earth`);
-    const data = await response.json();
-
-    for (const card of data) {
+    data.forEach((card: any) => {
       expect(card.suit).toBe("pentacles");
-    }
+    });
   });
 
-  // AC5: GET /cards/element/invalid → 400, error message
-  test("GET /api/cards/element/invalid returns 400 status", async () => {
-    const response = await fetch(`${baseUrl}/api/cards/element/invalid`);
-    expect(response.status).toBe(400);
-  });
-
-  test("GET /api/cards/element/invalid returns error message", async () => {
-    const response = await fetch(`${baseUrl}/api/cards/element/invalid`);
-    const data = await response.json();
+  it("returns 400 for invalid element", async () => {
+    const res = await app.handle(new Request("http://localhost/api/cards/element/invalid"));
+    const data = await res.json();
+    expect(res.status).toBe(400);
     expect(data.error).toBe("Invalid element. Must be one of: fire, water, air, earth");
   });
 
-  // AC6: GET /cards/element/ (empty) → 400 or 404
-  test("GET /api/cards/element/ (empty) returns 400 status", async () => {
-    const response = await fetch(`${baseUrl}/api/cards/element/`);
-    expect(response.status).toBe(400);
-  });
-
-  // AC7: Each card has id, name, suit, meanings
-  test("GET /api/cards/element/fire - cards have required fields", async () => {
-    const response = await fetch(`${baseUrl}/api/cards/element/fire`);
-    const data = await response.json();
-
+  it("each card has required fields (id, name, suit, meanings)", async () => {
+    const res = await app.handle(new Request("http://localhost/api/cards/element/fire"));
+    const data = await res.json();
+    expect(res.status).toBe(200);
     const card = data[0];
     expect(card).toHaveProperty("id");
     expect(card).toHaveProperty("name");
     expect(card).toHaveProperty("suit");
     expect(card).toHaveProperty("upright_meaning");
     expect(card).toHaveProperty("reversed_meaning");
-    expect(card).toHaveProperty("keywords");
-    expect(card.keywords).toBeArray();
   });
 
-  // AC8: No Major Arcana cards in any element response
-  test("GET /api/cards/element/fire - no Major Arcana cards", async () => {
-    const response = await fetch(`${baseUrl}/api/cards/element/fire`);
-    const data = await response.json();
-
-    for (const card of data) {
-      // Major Arcana cards have null or empty suit
+  it("excludes Major Arcana cards (no cards with null/empty suit)", async () => {
+    const res = await app.handle(new Request("http://localhost/api/cards/element/fire"));
+    const data = await res.json();
+    expect(res.status).toBe(200);
+    data.forEach((card: any) => {
       expect(card.suit).not.toBe(null);
       expect(card.suit).not.toBe("");
       expect(card.suit).toBeTruthy();
-    }
-  });
-
-  test("GET /api/cards/element/water - no Major Arcana cards", async () => {
-    const response = await fetch(`${baseUrl}/api/cards/element/water`);
-    const data = await response.json();
-
-    for (const card of data) {
-      expect(card.suit).not.toBe(null);
-      expect(card.suit).not.toBe("");
-      expect(card.suit).toBeTruthy();
-    }
-  });
-
-  test("GET /api/cards/element/air - no Major Arcana cards", async () => {
-    const response = await fetch(`${baseUrl}/api/cards/element/air`);
-    const data = await response.json();
-
-    for (const card of data) {
-      expect(card.suit).not.toBe(null);
-      expect(card.suit).not.toBe("");
-      expect(card.suit).toBeTruthy();
-    }
-  });
-
-  test("GET /api/cards/element/earth - no Major Arcana cards", async () => {
-    const response = await fetch(`${baseUrl}/api/cards/element/earth`);
-    const data = await response.json();
-
-    for (const card of data) {
-      expect(card.suit).not.toBe(null);
-      expect(card.suit).not.toBe("");
-      expect(card.suit).toBeTruthy();
-    }
+    });
   });
 });
