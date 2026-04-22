@@ -820,5 +820,80 @@ export function apiRoutes(db: Database) {
       db.prepare("DELETE FROM readings WHERE id = ?").run(numericId);
       set.status = 204;
       return null;
+    })
+
+    .get("/readings/stats", () => {
+      // Get total readings count
+      const totalReadingsQuery = db.query("SELECT COUNT(*) as count FROM readings");
+      const totalReadingsResult = totalReadingsQuery.get() as { count: number };
+      const totalReadings = totalReadingsResult.count;
+
+      // Get spread breakdown (GROUP BY spread_type)
+      const spreadBreakdownQuery = db.query(`
+        SELECT spread_type, COUNT(*) as count
+        FROM readings
+        GROUP BY spread_type
+      `);
+      const spreadBreakdownResult = spreadBreakdownQuery.all() as Array<{ spread_type: string; count: number }>;
+      const spreadBreakdown: Record<string, number> = {};
+      for (const row of spreadBreakdownResult) {
+        spreadBreakdown[row.spread_type] = row.count;
+      }
+
+      // Get most drawn cards (parse cards_json, count occurrences, top 5)
+      const allReadingsQuery = db.query("SELECT cards_json FROM readings");
+      const allReadings = allReadingsQuery.all() as Array<{ cards_json: string }>;
+
+      const cardCounts = new Map<number, number>();
+      for (const reading of allReadings) {
+        try {
+          const cardIds = JSON.parse(reading.cards_json) as number[];
+          for (const cardId of cardIds) {
+            cardCounts.set(cardId, (cardCounts.get(cardId) || 0) + 1);
+          }
+        } catch (error) {
+          // Skip invalid JSON
+          continue;
+        }
+      }
+
+      // Sort by count descending and take top 5
+      const sortedCards = Array.from(cardCounts.entries())
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 5);
+
+      // Fetch card names for the top cards
+      const mostDrawnCards: Array<{ cardId: number; name: string; count: number }> = [];
+      for (const [cardId, count] of sortedCards) {
+        const cardQuery = db.query("SELECT id, name FROM cards WHERE id = ?");
+        const card = cardQuery.get(cardId) as { id: number; name: string } | null;
+        if (card) {
+          mostDrawnCards.push({
+            cardId: card.id,
+            name: card.name,
+            count
+          });
+        }
+      }
+
+      // Get recent readings (last 7 days)
+      const sevenDaysAgo = new Date();
+      sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+      const sevenDaysAgoISO = sevenDaysAgo.toISOString();
+
+      const recentReadingsQuery = db.query(`
+        SELECT COUNT(*) as count
+        FROM readings
+        WHERE created_at >= ?
+      `);
+      const recentReadingsResult = recentReadingsQuery.get(sevenDaysAgoISO) as { count: number };
+      const recentReadings = recentReadingsResult.count;
+
+      return {
+        totalReadings,
+        spreadBreakdown,
+        mostDrawnCards,
+        recentReadings
+      };
     });
 }
