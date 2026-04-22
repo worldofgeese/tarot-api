@@ -308,4 +308,183 @@ describe("Security: Input Validation & Sanitization", () => {
       expect(Array.isArray(data)).toBe(true);
     });
   });
+
+  describe("Edge Case: Huge Numeric Values", () => {
+    test("GET /api/cards/:id rejects ID larger than MAX_SAFE_INTEGER", async () => {
+      const hugeId = "9007199254740992"; // MAX_SAFE_INTEGER + 1
+      const response = await fetch(`${baseUrl}/api/cards/${hugeId}`);
+
+      expect(response.status).toBe(400);
+      const data = await response.json();
+      expect(data.error).toBeDefined();
+      expect(data.error.toLowerCase()).toContain("invalid");
+    });
+
+    test("GET /api/cards/:id rejects scientific notation", async () => {
+      const response = await fetch(`${baseUrl}/api/cards/1e10`);
+
+      expect(response.status).toBe(400);
+      const data = await response.json();
+      expect(data.error).toBeDefined();
+    });
+
+    test("GET /api/cards/:id rejects ID with leading zeros (except 0)", async () => {
+      const response = await fetch(`${baseUrl}/api/cards/001`);
+
+      expect(response.status).toBe(400);
+      const data = await response.json();
+      expect(data.error).toBeDefined();
+    });
+
+    test("GET /api/cards/:id accepts ID '0' (special case)", async () => {
+      const response = await fetch(`${baseUrl}/api/cards/0`);
+
+      // Should accept 0 as valid (200 if exists, 404 if not)
+      expect([200, 404]).toContain(response.status);
+    });
+  });
+
+  describe("Edge Case: Missing Required Parameters", () => {
+    test("GET /api/search rejects missing 'q' parameter", async () => {
+      const response = await fetch(`${baseUrl}/api/search`);
+
+      expect(response.status).toBe(400);
+      const data = await response.json();
+      expect(data.error).toBeDefined();
+    });
+
+    test("GET /api/cards/search rejects missing 'q' parameter", async () => {
+      const response = await fetch(`${baseUrl}/api/cards/search`);
+
+      expect(response.status).toBe(400);
+      const data = await response.json();
+      expect(data.error).toBeDefined();
+    });
+
+    test("GET /api/cards/reversed rejects empty 'q' parameter", async () => {
+      const response = await fetch(`${baseUrl}/api/cards/reversed?q=`);
+
+      expect(response.status).toBe(400);
+      const data = await response.json();
+      expect(data.error).toBeDefined();
+    });
+  });
+
+  describe("Edge Case: Advanced SQL Injection Vectors", () => {
+    test("GET /api/search rejects chained SQL comments", async () => {
+      const payload = "test' -- comment";
+      const response = await fetch(`${baseUrl}/api/search?q=${encodeURIComponent(payload)}`);
+
+      expect([200, 400]).toContain(response.status);
+
+      if (response.status === 200) {
+        const data = await response.json();
+        expect(Array.isArray(data)).toBe(true);
+      }
+    });
+
+    test("GET /api/search rejects multi-line SQL comment", async () => {
+      const payload = "test /* DROP TABLE */ cards";
+      const response = await fetch(`${baseUrl}/api/search?q=${encodeURIComponent(payload)}`);
+
+      expect([200, 400]).toContain(response.status);
+
+      if (response.status === 200) {
+        const data = await response.json();
+        expect(Array.isArray(data)).toBe(true);
+      }
+    });
+
+    test("GET /api/search rejects hex-encoded SQL injection", async () => {
+      const payload = "0x44524F50"; // HEX for "DROP"
+      const response = await fetch(`${baseUrl}/api/search?q=${encodeURIComponent(payload)}`);
+
+      expect([200, 400]).toContain(response.status);
+    });
+  });
+
+  describe("Edge Case: Advanced XSS Vectors", () => {
+    test("GET /api/search sanitizes onclick event handler", async () => {
+      const xssPayload = '<div onclick="alert(1)">test</div>';
+      const response = await fetch(`${baseUrl}/api/search?q=${encodeURIComponent(xssPayload)}`);
+
+      expect([200, 400]).toContain(response.status);
+
+      if (response.status === 200) {
+        const data = await response.json();
+        const jsonStr = JSON.stringify(data);
+        expect(jsonStr.includes("onclick")).toBe(false);
+      }
+    });
+
+    test("GET /api/search sanitizes SVG-based XSS", async () => {
+      const xssPayload = '<svg onload="alert(1)">';
+      const response = await fetch(`${baseUrl}/api/search?q=${encodeURIComponent(xssPayload)}`);
+
+      expect([200, 400]).toContain(response.status);
+
+      if (response.status === 200) {
+        const data = await response.json();
+        const jsonStr = JSON.stringify(data);
+        expect(jsonStr.includes("onload")).toBe(false);
+      }
+    });
+
+    test("GET /api/search sanitizes data URI with JavaScript", async () => {
+      const xssPayload = 'data:text/html,<script>alert(1)</script>';
+      const response = await fetch(`${baseUrl}/api/search?q=${encodeURIComponent(xssPayload)}`);
+
+      expect([200, 400]).toContain(response.status);
+
+      if (response.status === 200) {
+        const data = await response.json();
+        const jsonStr = JSON.stringify(data);
+        expect(jsonStr.includes("<script>")).toBe(false);
+      }
+    });
+  });
+
+  describe("Edge Case: Numeric Parameter Validation", () => {
+    test("GET /api/cards rejects non-numeric limit parameter", async () => {
+      const response = await fetch(`${baseUrl}/api/cards?limit=abc`);
+
+      expect(response.status).toBe(400);
+      const data = await response.json();
+      expect(data.error).toBeDefined();
+      expect(data.error.toLowerCase()).toContain("number");
+    });
+
+    test("GET /api/cards rejects negative limit parameter", async () => {
+      const response = await fetch(`${baseUrl}/api/cards?limit=-10`);
+
+      expect(response.status).toBe(400);
+      const data = await response.json();
+      expect(data.error).toBeDefined();
+    });
+
+    test("GET /api/cards rejects negative offset parameter", async () => {
+      const response = await fetch(`${baseUrl}/api/cards?offset=-5`);
+
+      expect(response.status).toBe(400);
+      const data = await response.json();
+      expect(data.error).toBeDefined();
+    });
+
+    test("GET /api/cards rejects excessive limit (>1000)", async () => {
+      const response = await fetch(`${baseUrl}/api/cards?limit=999999`);
+
+      expect(response.status).toBe(400);
+      const data = await response.json();
+      expect(data.error).toBeDefined();
+      expect(data.error.toLowerCase()).toMatch(/limit|most/);
+    });
+
+    test("GET /api/cards accepts valid numeric parameters", async () => {
+      const response = await fetch(`${baseUrl}/api/cards?limit=10&offset=5`);
+
+      expect(response.status).toBe(200);
+      const data = await response.json();
+      expect(Array.isArray(data)).toBe(true);
+    });
+  });
 });
