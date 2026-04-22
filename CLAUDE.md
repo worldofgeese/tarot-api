@@ -25,6 +25,13 @@ FJ_EX=/home/node/.openclaw/bin/fj-ex
 ## Mandatory Session Start (every worker, every time)
 
 ```bash
+# 0. Worktree isolation — ALWAYS create an isolated worktree before doing anything
+# The branch name comes from your task brief.
+cd /home/node/.openclaw/workspace/projects/tarot-api
+/home/node/.openclaw/bin/decapod workspace ensure --branch <your-branch-name>
+# decapod prints the worktree path — cd into it. ALL subsequent work happens there.
+# If decapod fails, fall back to: git worktree add /tmp/tarot-api-<feature> -b <branch> main && cd /tmp/tarot-api-<feature>
+
 # 1. Decapod session init — IN THE WORKTREE, not main project dir
 /home/node/.openclaw/bin/decapod rpc --op agent.init
 # Read allowed_next_ops and blocked_by before proceeding
