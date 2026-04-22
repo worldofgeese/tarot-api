@@ -42,8 +42,34 @@ export function apiRoutes(db: Database) {
         cardCount
       };
     })
-    .get("/cards", ({ query }) => {
+    .get("/cards", ({ query, set }) => {
       const { limit = "100", offset = "0", arcana, suit } = query;
+
+      // Validate limit parameter
+      const limitNum = parseInt(limit as string, 10);
+      if (isNaN(limitNum)) {
+        set.status = 400;
+        return { error: "Parameter 'limit' must be a number" };
+      }
+      if (limitNum < 0) {
+        set.status = 400;
+        return { error: "Parameter 'limit' must be at least 0" };
+      }
+      if (limitNum > 1000) {
+        set.status = 400;
+        return { error: "Parameter 'limit' must be at most 1000" };
+      }
+
+      // Validate offset parameter
+      const offsetNum = parseInt(offset as string, 10);
+      if (isNaN(offsetNum)) {
+        set.status = 400;
+        return { error: "Parameter 'offset' must be a number" };
+      }
+      if (offsetNum < 0) {
+        set.status = 400;
+        return { error: "Parameter 'offset' must be at least 0" };
+      }
 
       let sql = "SELECT * FROM cards";
       const params: any[] = [];
@@ -64,7 +90,7 @@ export function apiRoutes(db: Database) {
       }
 
       sql += " LIMIT ? OFFSET ?";
-      params.push(parseInt(limit as string), parseInt(offset as string));
+      params.push(limitNum, offsetNum);
 
       const queryObj = db.query(sql);
       const cards = queryObj.all(...params) as Card[];
