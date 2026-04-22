@@ -1,2 +1,5 @@
 # Public npm registry
 registry = "https://registry.npmjs.org/"
+
+[test]
+preload = ["./tests/e2e/preload.ts", "./tests/e2e/setup.ts"]
