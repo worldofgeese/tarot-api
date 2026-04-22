@@ -1,4 +1,5 @@
 import { Database } from "bun:sqlite";
+import cards from "../../data/cards.json";
 
 export function initDatabase(dbPath: string = "data/tarot.db"): Database {
   const db = new Database(dbPath);
@@ -61,6 +62,29 @@ export function initDatabase(dbPath: string = "data/tarot.db"): Database {
       created_at TEXT NOT NULL DEFAULT (datetime('now'))
     )
   `);
+
+  // Seed data if database is empty (e.g., :memory: or new database)
+  const count = db.query("SELECT COUNT(*) as count FROM cards").get() as { count: number };
+  if (count.count === 0) {
+    const insert = db.prepare(`
+      INSERT INTO cards (id, name, arcana, suit, number, upright_meaning, reversed_meaning, keywords, image_desc)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `);
+
+    cards.forEach(card => {
+      insert.run(
+        card.id,
+        card.name,
+        card.arcana,
+        card.suit,
+        card.number,
+        card.upright_meaning,
+        card.reversed_meaning,
+        JSON.stringify(card.keywords),
+        card.image_desc
+      );
+    });
+  }
 
   return db;
 }

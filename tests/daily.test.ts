@@ -7,7 +7,7 @@ describe("GET /api/daily", () => {
 
   beforeAll(async () => {
     const { default: createApp } = await import("../src/index");
-    app = createApp();
+    app = createApp(":memory:");
     baseUrl = "http://localhost:3003";
 
     app.listen(3003);
