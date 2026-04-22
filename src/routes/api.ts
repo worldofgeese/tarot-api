@@ -393,6 +393,9 @@ export function apiRoutes(db: Database) {
         // Use the provided date
         const { card, date, reversed } = getDailyCard(db, parsedDate);
 
+        // Save to daily_history
+        db.query("INSERT OR IGNORE INTO daily_history (date, card_id) VALUES (?, ?)").run(date, card.id);
+
         return {
           ...card,
           keywords: parseKeywords(card.keywords),
@@ -404,11 +407,102 @@ export function apiRoutes(db: Database) {
       // No date parameter, use today's date
       const { card, date, reversed } = getDailyCard(db);
 
+      // Save to daily_history
+      db.query("INSERT OR IGNORE INTO daily_history (date, card_id) VALUES (?, ?)").run(date, card.id);
+
       return {
         ...card,
         keywords: parseKeywords(card.keywords),
         date,
         reversed
+      };
+    })
+
+    .get("/daily/history", ({ query, set }) => {
+      const { limit = "7", offset = "0" } = query;
+
+      const limitNum = parseInt(limit as string, 10);
+      if (isNaN(limitNum) || limitNum < 1) {
+        set.status = 400;
+        return { error: "Invalid limit parameter" };
+      }
+
+      const cappedLimit = Math.min(limitNum, 30);
+
+      const offsetNum = parseInt(offset as string, 10);
+      if (isNaN(offsetNum) || offsetNum < 0) {
+        set.status = 400;
+        return { error: "Invalid offset parameter" };
+      }
+
+      const totalResult = db.query("SELECT COUNT(*) as count FROM daily_history").get() as { count: number };
+      const total = totalResult.count;
+
+      const historyQuery = db.query(`
+        SELECT dh.date, dh.card_id, c.*
+        FROM daily_history dh
+        JOIN cards c ON dh.card_id = c.id
+        ORDER BY dh.date DESC
+        LIMIT ? OFFSET ?
+      `);
+      const historyRows = historyQuery.all(cappedLimit, offsetNum) as Array<{ date: string } & Card>;
+
+      const history = historyRows.map(row => ({
+        date: row.date,
+        card: {
+          id: row.id,
+          name: row.name,
+          arcana: row.arcana,
+          suit: row.suit,
+          number: row.number,
+          upright_meaning: row.upright_meaning,
+          reversed_meaning: row.reversed_meaning,
+          keywords: parseKeywords(row.keywords),
+          image_desc: row.image_desc
+        }
+      }));
+
+      return {
+        history,
+        total
+      };
+    })
+
+    .get("/daily/history/:date", ({ params, set }) => {
+      const { date } = params;
+
+      const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+      if (!dateRegex.test(date)) {
+        set.status = 400;
+        return { error: "Invalid date format. Use YYYY-MM-DD" };
+      }
+
+      const query = db.query(`
+        SELECT dh.date, dh.card_id, c.*
+        FROM daily_history dh
+        JOIN cards c ON dh.card_id = c.id
+        WHERE dh.date = ?
+      `);
+      const row = query.get(date) as ({ date: string } & Card) | null;
+
+      if (!row) {
+        set.status = 404;
+        return { error: "No daily card found for this date" };
+      }
+
+      return {
+        date: row.date,
+        card: {
+          id: row.id,
+          name: row.name,
+          arcana: row.arcana,
+          suit: row.suit,
+          number: row.number,
+          upright_meaning: row.upright_meaning,
+          reversed_meaning: row.reversed_meaning,
+          keywords: parseKeywords(row.keywords),
+          image_desc: row.image_desc
+        }
       };
     })
 
